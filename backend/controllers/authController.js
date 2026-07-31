@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const BlacklistedToken= require('../models/BlacklistedToken');
 
 const signup = async (req, res) => {
   try {
@@ -62,4 +63,17 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { signup, login };
+const logout = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader.split(' ')[1];
+
+    await BlacklistedToken.create({ token });
+
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+module.exports = { signup, login, logout };
