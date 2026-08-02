@@ -12,6 +12,7 @@
 
 import { Schema, model, Model } from 'mongoose';
 import { IUser } from '../types/auth.types';
+import { SUPPORTED_CURRENCIES, SUPPORTED_TIMEZONES } from '../types/user.types';
 
 const userSchema = new Schema<IUser>(
   {
@@ -28,12 +29,39 @@ const userSchema = new Schema<IUser>(
       required: [true, 'Password is required'],
       select: false, // never returned in queries unless explicitly requested
     },
+    // ─── Profile fields ────────────────────────────────────────────────────
+    fullName: {
+      type: String,
+      trim: true,
+      maxlength: [80, 'Full name must be at most 80 characters'],
+    },
+    avatar: {
+      type: String,
+      trim: true,
+    },
+    currency: {
+      type: String,
+      enum: {
+        values: SUPPORTED_CURRENCIES,
+        message: `Currency must be one of: ${SUPPORTED_CURRENCIES.join(', ')}`,
+      },
+      default: 'INR',
+    },
+    timezone: {
+      type: String,
+      enum: {
+        values: SUPPORTED_TIMEZONES,
+        message: `Timezone must be one of: ${SUPPORTED_TIMEZONES.join(', ')}`,
+      },
+      default: 'Asia/Kolkata',
+    },
   },
   {
     timestamps: true,
     versionKey: false,
   },
 );
+
 
 const User: Model<IUser> = model<IUser>('User', userSchema);
 

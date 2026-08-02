@@ -8,8 +8,8 @@ const ai = new GoogleGenAI({
 async function test() {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: "Say only the word Hello.",
+      model: "gemini-3.6-flash",
+      contents: "Suggest savings tips for students",
     });
 
     console.log(response.text);

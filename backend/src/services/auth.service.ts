@@ -26,6 +26,7 @@ import {
   SignupResponseData,
   LoginResponseData,
   JwtPayload,
+  IUser,
 } from '../types/auth.types';
 
 const SALT_ROUNDS = 10;
@@ -37,7 +38,17 @@ const signToken = (payload: Omit<JwtPayload, 'iat' | 'exp'>): string => {
   return jwt.sign(payload, config.jwtSecret, { expiresIn: JWT_EXPIRES_IN });
 };
 
-const buildPublicUser = (id: string, username: string) => ({ id, username });
+const buildPublicUser = (user: IUser) => ({
+  id: user._id.toString(),
+  username: user.username,
+  fullName: user.fullName,
+  avatar: user.avatar,
+  currency: user.currency,
+  timezone: user.timezone,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
+});
+
 
 // ─── Service methods ──────────────────────────────────────────────────────────
 
@@ -61,7 +72,7 @@ export const signupUser = async (body: SignupBody): Promise<SignupResponseData> 
   });
 
   return {
-    user: buildPublicUser(newUser._id.toString(), newUser.username),
+    user: buildPublicUser(newUser),
   };
 };
 
@@ -89,9 +100,10 @@ export const loginUser = async (body: LoginBody): Promise<LoginResponseData> => 
 
   return {
     token,
-    user: buildPublicUser(user._id.toString(), user.username),
+    user: buildPublicUser(user),
   };
 };
+
 
 /**
  * Invalidate a JWT by storing it in the blacklist collection.

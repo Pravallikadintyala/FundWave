@@ -38,6 +38,12 @@ export interface LoginBody {
 export interface PublicUser {
   id: string;
   username: string;
+  fullName?: string;
+  avatar?: string;
+  currency: string;
+  timezone: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 /** Payload returned on successful login. */
@@ -68,6 +74,11 @@ export interface IUser {
   _id: Types.ObjectId;
   username: string;
   password: string;
+  // ─── Profile fields ──────────────────────────────
+  fullName?: string;
+  avatar?: string;
+  currency: string;
+  timezone: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
