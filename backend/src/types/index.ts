@@ -8,5 +8,7 @@ export * from './user.types';
 export * from './finance.types';
 export * from './dashboard.types';
 export * from './savings.types';
+export * from './ai.types';
+
 
 

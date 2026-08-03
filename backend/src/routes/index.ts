@@ -12,6 +12,7 @@ import categoryRouter from './category.routes';
 import transactionRouter from './transaction.routes';
 import dashboardRouter from './dashboard.routes';
 import savingsRouter from './savings.routes';
+import aiRouter from './ai.routes';
 
 const router: Router = Router();
 
@@ -22,6 +23,8 @@ router.use('/categories', categoryRouter);
 router.use('/transactions', transactionRouter);
 router.use('/dashboard', dashboardRouter);
 router.use('/savings-goals', savingsRouter);
+router.use('/ai', aiRouter);
 
 export default router;
+
 

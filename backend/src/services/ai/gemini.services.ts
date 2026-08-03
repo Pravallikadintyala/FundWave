@@ -6,7 +6,7 @@ const ai = new GoogleGenAI({
 
 export async function generateInsight(prompt: string): Promise<string> {
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-pro",
+    model: "gemini-3.6-flash",
     contents: prompt,
   });
 
