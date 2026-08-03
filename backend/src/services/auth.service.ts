@@ -19,6 +19,7 @@ import jwt from 'jsonwebtoken';
 import { config } from '../config/env';
 import { User, BlacklistedToken } from '../models';
 import { AppError } from '../utils/AppError';
+import { seedDefaultCategories } from './category.service';
 import { HTTP_STATUS } from '../constants';
 import {
   SignupBody,
@@ -70,6 +71,9 @@ export const signupUser = async (body: SignupBody): Promise<SignupResponseData> 
     username: username.trim(),
     password: hashedPassword,
   });
+
+  // Seed default Income/Expense categories for every new user
+  await seedDefaultCategories(newUser._id.toString());
 
   return {
     user: buildPublicUser(newUser),

@@ -22,21 +22,21 @@ const startServer = async (): Promise<void> => {
 
   const server = app.listen(config.port, () => {
     console.log(
-      `🚀 FundWave API running on http://localhost:${config.port} [${config.nodeEnv}]`,
+      `FundWave API running on http://localhost:${config.port} [${config.nodeEnv}]`,
     );
   });
 
   // ─── Graceful Shutdown ──────────────────────────────────────────────────────
   const shutdown = (signal: string): void => {
-    console.log(`\n📴 ${signal} received. Shutting down gracefully...`);
+    console.log(`\n ${signal} received. Shutting down gracefully...`);
     server.close(() => {
-      console.log('✅ HTTP server closed');
+      console.log(' HTTP server closed');
       process.exit(0);
     });
 
     // Force-kill if server hasn't closed within 10s
     setTimeout(() => {
-      console.error('❌ Forced shutdown after timeout');
+      console.error(' Forced shutdown after timeout');
       process.exit(1);
     }, 10_000).unref();
   };
@@ -46,12 +46,12 @@ const startServer = async (): Promise<void> => {
 
   // ─── Unhandled Rejections / Exceptions ────────────────────────────────────
   process.on('unhandledRejection', (reason: unknown) => {
-    console.error('🔥 Unhandled Rejection:', reason);
+    console.error(' Unhandled Rejection:', reason);
     server.close(() => process.exit(1));
   });
 
   process.on('uncaughtException', (error: Error) => {
-    console.error('🔥 Uncaught Exception:', error.message);
+    console.error(' Uncaught Exception:', error.message);
     process.exit(1);
   });
 };
