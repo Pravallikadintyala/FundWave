@@ -1,15 +1,18 @@
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import AppRouter from '@/routes/AppRouter';
 
 /**
- * App — root composition: router → auth context → route tree.
+ * App — root composition: router → theme → auth → route tree.
  */
 const App = () => (
   <BrowserRouter>
-    <AuthProvider>
-      <AppRouter />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppRouter />
+      </AuthProvider>
+    </ThemeProvider>
   </BrowserRouter>
 );
 

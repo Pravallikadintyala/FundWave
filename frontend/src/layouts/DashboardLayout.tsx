@@ -1,38 +1,32 @@
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import Sidebar from '@/components/layout/Sidebar';
+import TopNavbar from '@/components/layout/TopNavbar';
 
-/**
- * DashboardLayout — wrapper for all authenticated pages.
- *
- * Structure:
- *  ┌─────────────────────────────────────┐
- *  │  Sidebar (fixed left)               │
- *  │  ┌───────────────────────────────┐  │
- *  │  │  TopNavbar                    │  │
- *  │  ├───────────────────────────────┤  │
- *  │  │  <Outlet /> (page content)    │  │
- *  │  └───────────────────────────────┘  │
- *  └─────────────────────────────────────┘
- */
-const DashboardLayout = () => (
-  <div className="flex h-screen overflow-hidden bg-gray-100">
-    {/* Sidebar placeholder */}
-    <aside className="w-64 shrink-0 bg-white border-r border-gray-200 flex items-center justify-center">
-      <span className="text-sm text-gray-400">Sidebar</span>
-    </aside>
+const DashboardLayout = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-    {/* Main area */}
-    <div className="flex flex-col flex-1 overflow-hidden">
-      {/* Top navbar placeholder */}
-      <header className="h-16 shrink-0 bg-white border-b border-gray-200 flex items-center px-6">
-        <span className="text-sm text-gray-400">TopNavbar</span>
-      </header>
+  return (
+    <div className="dashboard-layout">
+      <Sidebar
+        collapsed={collapsed}
+        onCollapse={setCollapsed}
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
+      />
 
-      {/* Page content */}
-      <main className="flex-1 overflow-y-auto p-6">
-        <Outlet />
-      </main>
+      <div className={['dashboard-layout__main', collapsed ? 'dashboard-layout__main--collapsed' : ''].filter(Boolean).join(' ')}>
+        <TopNavbar
+          onMenuToggle={() => setMobileOpen(v => !v)}
+          sidebarCollapsed={collapsed}
+        />
+        <main className="dashboard-layout__content" id="main-content" tabIndex={-1}>
+          <Outlet />
+        </main>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default DashboardLayout;

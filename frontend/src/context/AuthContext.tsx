@@ -65,9 +65,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const checkAuth = useCallback(async () => {
     const storedToken = localStorage.getItem(TOKEN_KEY);
-    if (!storedToken) {
-      setIsLoading(false);
-      return;
+    const storedUser  = localStorage.getItem(USER_KEY);
+    if (!storedToken) { setIsLoading(false); return; }
+
+    // Dev-preview: if a stored user JSON exists, hydrate without API call
+    if (storedUser) {
+      try {
+        const parsed = JSON.parse(storedUser) as User;
+        persist(storedToken, parsed);
+        setIsLoading(false);
+        return;
+      } catch { /* fall through to API verify */ }
     }
 
     try {

@@ -8,6 +8,7 @@ import RegisterPage from '@/pages/RegisterPage';
 import DashboardPage from '@/pages/DashboardPage';
 import TransactionsPage from '@/pages/TransactionsPage';
 import SavingsGoalsPage from '@/pages/SavingsGoalsPage';
+import AIInsightsPage from '@/pages/AIInsightsPage';
 import ProfilePage from '@/pages/ProfilePage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
@@ -15,33 +16,35 @@ import NotFoundPage from '@/pages/NotFoundPage';
  * AppRouter — central route configuration.
  *
  * Route groups:
- *  Public     /          LandingPage
- *  Auth       /login     LoginPage
- *             /register  RegisterPage
- *  Protected  /dashboard DashboardPage
- *             /transactions
- *             /savings-goals
- *             /profile
- *  Fallback   *          NotFoundPage
+ *  Public     /               LandingPage
+ *  Auth       /login          LoginPage
+ *             /register       RegisterPage
+ *  Protected  /dashboard      DashboardPage
+ *             /transactions   TransactionsPage
+ *             /savings-goals  SavingsGoalsPage
+ *             /ai-insights    AIInsightsPage
+ *             /profile        ProfilePage
+ *  Fallback   *               NotFoundPage
  */
 const AppRouter = () => (
   <Routes>
     {/* Public landing */}
     <Route path="/" element={<LandingPage />} />
 
-    {/* Auth pages — centred card layout */}
+    {/* Auth pages — branded split layout */}
     <Route element={<AuthLayout />}>
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login"    element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
     </Route>
 
-    {/* Protected pages — dashboard shell layout */}
+    {/* Protected pages — dashboard shell */}
     <Route element={<ProtectedRoute />}>
       <Route element={<DashboardLayout />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/transactions" element={<TransactionsPage />} />
+        <Route path="/dashboard"     element={<DashboardPage />} />
+        <Route path="/transactions"  element={<TransactionsPage />} />
         <Route path="/savings-goals" element={<SavingsGoalsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/ai-insights"   element={<AIInsightsPage />} />
+        <Route path="/profile"       element={<ProfilePage />} />
       </Route>
     </Route>
 
