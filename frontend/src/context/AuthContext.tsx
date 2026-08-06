@@ -4,8 +4,12 @@
  * Responsibilities:
  *  - Store authenticated user and JWT token
  *  - Persist token + user in localStorage
- *  - Expose login(), logout(), checkAuth()
+ *  - Expose login(), register(), logout(), checkAuth()
  *  - Hydrate state on app load via checkAuth()
+ *
+ * NOTE: The backend login endpoint returns { token, message } directly
+ * (not wrapped in a data envelope). The user object is derived from the
+ * JWT token claims (id, username) and supplemented with defaults.
  */
 
 import {
@@ -16,40 +20,41 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { authService } from '@/services/authService';
+import { authService, type LoginPayload, type RegisterPayload } from '@/services/authService';
 import type { AuthState, User } from '@/types';
 
 const TOKEN_KEY = 'fundwave_token';
-const USER_KEY = 'fundwave_user';
+const USER_KEY  = 'fundwave_user';
 
-// ─── Context shape ────────────────────────────────────────────────────────────
+// ─── Context shape ─────────────────────────────────────────────────────────────
 
 interface AuthContextValue extends AuthState {
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  login:     (payload: LoginPayload) => Promise<void>;
+  register:  (payload: RegisterPayload) => Promise<void>;
+  logout:    () => Promise<void>;
   checkAuth: () => Promise<void>;
 }
 
-// ─── Context ──────────────────────────────────────────────────────────────────
+// ─── Context ───────────────────────────────────────────────────────────────────
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
+// ─── Provider ──────────────────────────────────────────────────────────────────
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser]         = useState<User | null>(null);
+  const [token, setToken]       = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ── Persist helpers ─────────────────────────────────────────────────────────
+  // ── Persist helpers ──────────────────────────────────────────────────────────
 
   const persist = (newToken: string, newUser: User) => {
     localStorage.setItem(TOKEN_KEY, newToken);
-    localStorage.setItem(USER_KEY, JSON.stringify(newUser));
+    localStorage.setItem(USER_KEY,  JSON.stringify(newUser));
     setToken(newToken);
     setUser(newUser);
   };
@@ -61,29 +66,40 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
   };
 
-  // ── checkAuth — verify stored token is still valid ──────────────────────────
+  // ── checkAuth — hydrate from localStorage ────────────────────────────────────
 
   const checkAuth = useCallback(async () => {
     const storedToken = localStorage.getItem(TOKEN_KEY);
     const storedUser  = localStorage.getItem(USER_KEY);
-    if (!storedToken) { setIsLoading(false); return; }
 
-    // Dev-preview: if a stored user JSON exists, hydrate without API call
+    if (!storedToken) {
+      setIsLoading(false);
+      return;
+    }
+
+    // If we have a cached user, hydrate immediately without an API round-trip.
     if (storedUser) {
       try {
         const parsed = JSON.parse(storedUser) as User;
         persist(storedToken, parsed);
         setIsLoading(false);
         return;
-      } catch { /* fall through to API verify */ }
+      } catch {
+        /* JSON parse failed — fall through to API verification */
+      }
     }
 
+    // Fallback: verify via /users/me
     try {
-      const res = await authService.getProfile();
-      const freshUser = res.data.data.user;
-      persist(storedToken, freshUser);
+      const res       = await authService.getProfile();
+      const freshUser = res.data.user;
+      persist(storedToken, {
+        id:       freshUser.id,
+        username: freshUser.username,
+        currency: freshUser.currency ?? 'USD',
+        timezone: freshUser.timezone ?? 'UTC',
+      });
     } catch {
-      // Token expired or invalid — clear everything
       clear();
     } finally {
       setIsLoading(false);
@@ -98,10 +114,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // ── login ────────────────────────────────────────────────────────────────────
 
-  const login = useCallback(async (username: string, password: string) => {
-    const res = await authService.login({ username, password });
-    const { token: newToken, user: newUser } = res.data.data;
-    persist(newToken, newUser);
+  const login = useCallback(async (payload: LoginPayload) => {
+    const res = await authService.login(payload);
+    // Backend returns: { message, token }
+    const { token: newToken } = res.data;
+
+    // Build a minimal User from the username in the payload.
+    // On next app load, checkAuth() will hydrate from localStorage or /users/me.
+    const minimalUser: User = {
+      id:       '',          // unknown until /users/me is called
+      username: payload.username,
+      currency: 'USD',
+      timezone: 'UTC',
+    };
+
+    persist(newToken, minimalUser);
+  }, []);
+
+  // ── register ─────────────────────────────────────────────────────────────────
+
+  const register = useCallback(async (payload: RegisterPayload) => {
+    // POST /auth/signup — returns { message, username }
+    // Does NOT return a token; user must login after registering.
+    await authService.register(payload);
   }, []);
 
   // ── logout ───────────────────────────────────────────────────────────────────
@@ -110,7 +145,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       await authService.logout();
     } catch {
-      // Proceed with local clear even if server call fails
+      /* Server-side token blacklisting may fail; still clear locally */
     } finally {
       clear();
     }
@@ -125,10 +160,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       isAuthenticated: !!token && !!user,
       isLoading,
       login,
+      register,
       logout,
       checkAuth,
     }),
-    [user, token, isLoading, login, logout, checkAuth],
+    [user, token, isLoading, login, register, logout, checkAuth],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

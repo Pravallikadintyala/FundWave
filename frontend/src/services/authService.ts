@@ -1,40 +1,78 @@
 /**
- * Auth service — API calls for authentication endpoints.
- * No business logic. Called by AuthContext only.
+ * authService — thin API layer for all authentication endpoints.
+ *
+ * Maps one-to-one to backend routes:
+ *   POST /auth/signup  → register
+ *   POST /auth/login   → login
+ *   POST /auth/logout  → logout (protected, sends bearer token)
+ *
+ * No business logic. No state. Called by AuthContext or auth pages.
  */
 
 import apiClient from '@/api/axiosClient';
-import { ApiResponse, User } from '@/types';
 
-interface LoginPayload {
+// ─── Payload shapes ────────────────────────────────────────────────────────────
+
+export interface LoginPayload {
+  /** Backend field name is `username`. Forms may label it "Email / Username". */
   username: string;
   password: string;
 }
 
-interface RegisterPayload {
+export interface RegisterPayload {
   username: string;
   password: string;
 }
 
-interface AuthResponseData {
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+// ─── Response shapes (raw backend JSON) ────────────────────────────────────────
+
+export interface LoginResponseData {
+  message: string;
   token: string;
-  user: User;
 }
 
-interface RegisterResponseData {
-  user: User;
+export interface RegisterResponseData {
+  message: string;
+  username: string;
 }
+
+export interface LogoutResponseData {
+  message: string;
+}
+
+// ─── Service ───────────────────────────────────────────────────────────────────
 
 export const authService = {
+  /**
+   * POST /auth/login
+   * Returns { message, token }.
+   */
   login: (payload: LoginPayload) =>
-    apiClient.post<ApiResponse<AuthResponseData>>('/auth/login', payload),
+    apiClient.post<LoginResponseData>('/auth/login', payload),
 
+  /**
+   * POST /auth/signup
+   * Returns { message, username }.
+   */
   register: (payload: RegisterPayload) =>
-    apiClient.post<ApiResponse<RegisterResponseData>>('/auth/signup', payload),
+    apiClient.post<RegisterResponseData>('/auth/signup', payload),
 
+  /**
+   * POST /auth/logout (protected)
+   * Returns { message }.
+   */
   logout: () =>
-    apiClient.post<ApiResponse<null>>('/auth/logout'),
+    apiClient.post<LogoutResponseData>('/auth/logout'),
 
+  /**
+   * GET /users/me (protected)
+   * Returns the authenticated user profile.
+   * Used by AuthContext to hydrate state on app load.
+   */
   getProfile: () =>
-    apiClient.get<ApiResponse<{ user: User }>>('/users/me'),
+    apiClient.get<{ user: { id: string; username: string; currency: string; timezone: string } }>('/users/me'),
 };
