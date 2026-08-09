@@ -38,9 +38,26 @@ const LandingHero = () => {
     <section className="lhero" aria-label="Hero section">
       {/* Background mesh gradient */}
       <div className="lhero__bg" aria-hidden="true">
-        <div className="lhero__bg-orb lhero__bg-orb--1" />
-        <div className="lhero__bg-orb lhero__bg-orb--2" />
-        <div className="lhero__bg-orb lhero__bg-orb--3" />
+        <svg
+          className="lhero__bg-waves"
+          viewBox="0 0 2000 1000"
+          preserveAspectRatio="xMidYMid slice"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* We use a long path that repeats its pattern, so animating it -50% loops perfectly */}
+          <path
+            className="lhero__wave-path lhero__wave-path--1"
+            d="M 0 500 Q 250 300 500 500 T 1000 500 T 1500 500 T 2000 500 T 2500 500 T 3000 500 T 3500 500 T 4000 500"
+          />
+          <path
+            className="lhero__wave-path lhero__wave-path--2"
+            d="M 0 600 Q 250 800 500 600 T 1000 600 T 1500 600 T 2000 600 T 2500 600 T 3000 600 T 3500 600 T 4000 600"
+          />
+          <path
+            className="lhero__wave-path lhero__wave-path--3"
+            d="M 0 400 Q 250 150 500 400 T 1000 400 T 1500 400 T 2000 400 T 2500 400 T 3000 400 T 3500 400 T 4000 400"
+          />
+        </svg>
         <div className="lhero__bg-grid" />
       </div>
 

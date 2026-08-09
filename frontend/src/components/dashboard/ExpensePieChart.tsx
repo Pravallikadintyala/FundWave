@@ -18,10 +18,10 @@ import type { ExpenseByCategory } from '@/types';
 // ── Color palette — muted, elegant ────────────────────────────────────────────
 
 const PALETTE = [
-  '#6366f1', // indigo
-  '#8b5cf6', // violet
-  '#06b6d4', // cyan
+  '#0d9488', // teal
   '#10b981', // emerald
+  '#06b6d4', // cyan
+  '#6366f1', // indigo
   '#f59e0b', // amber
   '#f97316', // orange
   '#ec4899', // pink

@@ -11,13 +11,13 @@
   --color-border:       #e4e7ef;
   --color-border-subtle:#f0f2f8;
 
-  --color-primary:      #6366f1;
-  --color-primary-hover:#4f52d4;
-  --color-primary-muted:#eef0fd;
+  --color-primary:      #0f766e;
+  --color-primary-hover:#0d9488;
+  --color-primary-muted:#f0fdfa;
   --color-primary-fg:   #ffffff;
 
-  --color-secondary:    #8b5cf6;
-  --color-secondary-muted:#f3f0fd;
+  --color-secondary:    #059669;
+  --color-secondary-muted:#ecfdf5;
 
   --color-text:         #0f1117;
   --color-text-secondary:#4b5470;
@@ -44,8 +44,8 @@
   /* Sidebar */
   --color-sidebar-bg:   #ffffff;
   --color-sidebar-border:#e4e7ef;
-  --color-nav-active-bg:#eef0fd;
-  --color-nav-active-text:#6366f1;
+  --color-nav-active-bg:#f0fdfa;
+  --color-nav-active-text:#0f766e;
   --color-nav-hover-bg: #f5f6fb;
 
   /* Shadows */
@@ -130,13 +130,13 @@
   --color-border:       #252836;
   --color-border-subtle:#1e2130;
 
-  --color-primary:      #818cf8;
-  --color-primary-hover:#a5b4fc;
-  --color-primary-muted:#1e2240;
+  --color-primary:      #2dd4bf;
+  --color-primary-hover:#5eead4;
+  --color-primary-muted:#134e4a;
   --color-primary-fg:   #0f1117;
 
-  --color-secondary:    #a78bfa;
-  --color-secondary-muted:#1e1a38;
+  --color-secondary:    #34d399;
+  --color-secondary-muted:#064e3b;
 
   --color-text:         #f1f3f9;
   --color-text-secondary:#9aa3b8;
@@ -162,8 +162,8 @@
 
   --color-sidebar-bg:   #13161e;
   --color-sidebar-border:#252836;
-  --color-nav-active-bg:#1e2240;
-  --color-nav-active-text:#818cf8;
+  --color-nav-active-bg:#134e4a;
+  --color-nav-active-text:#2dd4bf;
   --color-nav-hover-bg: #1a1d28;
 
   --shadow-xs:   0 1px 2px 0 rgb(0 0 0 / 0.3);
@@ -711,7 +711,7 @@ img, svg { display: block; max-width: 100%; }
 .auth-layout { display: flex; min-height: 100vh; background: var(--color-bg); }
 
 .auth-layout__panel {
-  display: none; width: 42%; background: linear-gradient(145deg, #4f46e5 0%, #7c3aed 60%, #6366f1 100%);
+  display: none; width: 42%; background: linear-gradient(145deg, var(--color-primary) 0%, var(--color-secondary) 60%, var(--color-primary-hover) 100%);
   position: relative; overflow: hidden; padding: var(--space-12);
   flex-direction: column; justify-content: center;
 }
@@ -2983,18 +2983,49 @@ img, svg { display: block; max-width: 100%; }
   opacity: 0.6;
 }
 
-.lhero__bg-orb {
-  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.45;
-  animation: orbDrift 8s ease-in-out infinite;
+.lhero__bg-waves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.15;
+  filter: blur(1px);
 }
-.lhero__bg-orb--1 { width: 600px; height: 600px; background: var(--color-primary); top: -200px; right: -100px; animation-delay: 0s; }
-.lhero__bg-orb--2 { width: 400px; height: 400px; background: var(--color-secondary); bottom: -100px; left: -100px; animation-delay: -3s; }
-.lhero__bg-orb--3 { width: 300px; height: 300px; background: var(--color-success); top: 40%; left: 40%; animation-delay: -5s; opacity: 0.2; }
+.lhero__wave-path {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.lhero__wave-path--1 {
+  stroke-width: 3;
+  opacity: 0.8;
+  animation: waveFlow 25s linear infinite;
+}
+.lhero__wave-path--2 {
+  stroke-width: 2;
+  opacity: 0.5;
+  stroke: var(--color-secondary);
+  animation: waveFlow 35s linear infinite reverse;
+}
+.lhero__wave-path--3 {
+  stroke-width: 1.5;
+  opacity: 0.3;
+  animation: waveFlow 45s linear infinite;
+}
 
-@keyframes orbDrift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -20px) scale(1.05); }
-  66% { transform: translate(-20px, 10px) scale(0.95); }
+@keyframes waveFlow {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lhero__wave-path--1,
+  .lhero__wave-path--2,
+  .lhero__wave-path--3 {
+    animation: none;
+  }
 }
 
 .lhero__inner {
@@ -3503,3 +3534,24 @@ img, svg { display: block; max-width: 100%; }
 /* Old landing classes kept for backward compat */
 .landing-page { display: flex; flex-direction: column; min-height: 100vh; background: var(--color-bg); overflow-x: hidden; }
 .landing-main { flex: 1; }
+
+/* Scroll to Top */
+.scroll-to-top {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: var(--z-overlay);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: var(--shadow-lg);
+  animation: fadeUp 0.3s ease-out;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

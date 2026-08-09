@@ -13,11 +13,11 @@ export const GOAL_ICONS = [
 ] as const;
 
 export const GOAL_COLORS = [
-  '#6366f1', // indigo (primary)
-  '#8b5cf6', // violet
+  '#0d9488', // teal (primary)
+  '#10b981', // emerald
   '#ec4899', // pink
   '#f59e0b', // amber
-  '#10b981', // emerald
+  '#6366f1', // indigo
   '#06b6d4', // cyan
   '#3b82f6', // blue
   '#ef4444', // red
