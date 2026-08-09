@@ -62,6 +62,7 @@ const LandingNavigation = () => {
         <div className="lnav__links">
           <a href="#features" className="lnav__link">Features</a>
           <a href="#preview" className="lnav__link">Preview</a>
+          <a href="#contact" className="lnav__link">Contact Us</a>
         </div>
 
         {/* Actions */}
@@ -98,9 +99,9 @@ const LandingNavigation = () => {
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="5" height="5" rx="1" /><rect x="9" y="2" width="5" height="5" rx="1" /><rect x="2" y="9" width="5" height="5" rx="1" /><rect x="9" y="9" width="5" height="5" rx="1" /></svg>
                       Dashboard
                     </button>
-                    <button type="button" className="lnav__drop-item" role="menuitem" onClick={() => { setDropdownOpen(false); navigate('/profile'); }}>
+                    <button type="button" className="lnav__drop-item" role="menuitem" onClick={() => { setDropdownOpen(false); navigate('/settings'); }}>
                       <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="5" r="3" /><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" /></svg>
-                      Profile
+                      Settings
                     </button>
                     <div className="lnav__drop-sep" />
                     <button type="button" className="lnav__drop-item lnav__drop-item--danger" role="menuitem" onClick={handleLogout}>

@@ -15,7 +15,7 @@ const LandingFooter = () => {
   const navigate = useNavigate();
 
   return (
-    <footer className="lfooter" role="contentinfo">
+    <footer id="contact" className="lfooter" role="contentinfo">
       {/* CTA Banner */}
       <div className="lfooter__cta">
         <div className="lfooter__cta-inner">

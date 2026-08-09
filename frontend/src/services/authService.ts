@@ -32,6 +32,13 @@ export interface ForgotPasswordPayload {
   email: string;
 }
 
+export interface UpdateProfilePayload {
+  fullName?: string;
+  avatar?: string;
+  currency?: string;
+  timezone?: string;
+}
+
 // ─── Response shapes (raw backend JSON, including the { success, data } envelope) ─
 
 /** Shape of res.data for POST /auth/login */
@@ -112,4 +119,11 @@ export const authService = {
    */
   getProfile: () =>
     apiClient.get<ProfileResponseEnvelope>('/users/me'),
+
+  /**
+   * PUT /users/me (protected)
+   * Backend returns: { success: true, data: { user: { ... } } }
+   */
+  updateProfile: (payload: UpdateProfilePayload) =>
+    apiClient.put<ProfileResponseEnvelope>('/users/me', payload),
 };

@@ -67,7 +67,7 @@ const navItems = [
   { to: '/transactions',  label: 'Transactions',   Icon: TransactionsIcon },
   { to: '/savings-goals', label: 'Savings Goals',  Icon: SavingsIcon },
   { to: '/insights',      label: 'AI Insights',    Icon: AIIcon },
-  { to: '/profile',       label: 'Profile',        Icon: ProfileIcon },
+  { to: '/settings',      label: 'Settings',       Icon: ProfileIcon },
 ];
 
 const Sidebar = ({ collapsed, onCollapse, mobileOpen, onMobileClose }: SidebarProps) => (
