@@ -5,6 +5,7 @@
  * Composed entirely from small, focused sub-components.
  */
 
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useDashboard } from '@/hooks/useDashboard';
 import { useAIInsights } from '@/hooks/useAIInsights';
@@ -48,13 +49,19 @@ const DashboardError = ({ message, onRetry }: DashboardErrorProps) => (
 interface SectionHeaderProps {
   title: string;
   subtitle?: string;
+  linkTo?: string;
+  linkLabel?: string;
 }
 
-const SectionHeader = ({ title, subtitle }: SectionHeaderProps) => (
+const SectionHeader = ({ title, subtitle, linkTo, linkLabel }: SectionHeaderProps) => (
   <CardHeader>
     <div className="card-section-header">
       <h2 className="card-section-title">{title}</h2>
-      {subtitle && <span className="label-sm">{subtitle}</span>}
+      {linkTo ? (
+        <Link to={linkTo} className="card-section-link">{linkLabel ?? 'View all'} →</Link>
+      ) : (
+        subtitle && <span className="label-sm">{subtitle}</span>
+      )}
     </div>
   </CardHeader>
 );
@@ -136,7 +143,7 @@ const DashboardPage = () => {
 
         {/* Savings Snapshot */}
         <Card variant="default" padding="lg">
-          <SectionHeader title="Savings Snapshot" subtitle="All goals" />
+          <SectionHeader title="Savings Snapshot" linkTo="/savings-goals" linkLabel="View all goals" />
           <CardBody>
             <SavingsSnapshot savings={data.savings} />
           </CardBody>

@@ -7,6 +7,10 @@
  *   POST /auth/logout  → logout (protected, sends bearer token)
  *
  * No business logic. No state. Called by AuthContext or auth pages.
+ *
+ * NOTE: All backend responses are wrapped in { success: true, data: T }.
+ * These types reflect the full Axios response body (res.data), including
+ * the envelope layer.
  */
 
 import apiClient from '@/api/axiosClient';
@@ -28,20 +32,54 @@ export interface ForgotPasswordPayload {
   email: string;
 }
 
-// ─── Response shapes (raw backend JSON) ────────────────────────────────────────
+// ─── Response shapes (raw backend JSON, including the { success, data } envelope) ─
 
-export interface LoginResponseData {
-  message: string;
-  token: string;
+/** Shape of res.data for POST /auth/login */
+export interface LoginResponseEnvelope {
+  success: boolean;
+  data: {
+    token: string;
+    user: {
+      id: string;
+      username: string;
+      fullName?: string;
+      avatar?: string;
+      currency: string;
+      timezone: string;
+    };
+  };
 }
 
-export interface RegisterResponseData {
-  message: string;
-  username: string;
+/** Shape of res.data for POST /auth/signup */
+export interface RegisterResponseEnvelope {
+  success: boolean;
+  data: {
+    user: {
+      id: string;
+      username: string;
+    };
+  };
 }
 
-export interface LogoutResponseData {
-  message: string;
+/** Shape of res.data for POST /auth/logout */
+export interface LogoutResponseEnvelope {
+  success: boolean;
+  data: { message: string };
+}
+
+/** Shape of res.data for GET /users/me */
+export interface ProfileResponseEnvelope {
+  success: boolean;
+  data: {
+    user: {
+      id: string;
+      username: string;
+      fullName?: string;
+      avatar?: string;
+      currency: string;
+      timezone: string;
+    };
+  };
 }
 
 // ─── Service ───────────────────────────────────────────────────────────────────
@@ -49,30 +87,29 @@ export interface LogoutResponseData {
 export const authService = {
   /**
    * POST /auth/login
-   * Returns { message, token }.
+   * Backend returns: { success: true, data: { token, user } }
    */
   login: (payload: LoginPayload) =>
-    apiClient.post<LoginResponseData>('/auth/login', payload),
+    apiClient.post<LoginResponseEnvelope>('/auth/login', payload),
 
   /**
    * POST /auth/signup
-   * Returns { message, username }.
+   * Backend returns: { success: true, data: { user } }
    */
   register: (payload: RegisterPayload) =>
-    apiClient.post<RegisterResponseData>('/auth/signup', payload),
+    apiClient.post<RegisterResponseEnvelope>('/auth/signup', payload),
 
   /**
    * POST /auth/logout (protected)
-   * Returns { message }.
+   * Backend returns: { success: true, data: { message } }
    */
   logout: () =>
-    apiClient.post<LogoutResponseData>('/auth/logout'),
+    apiClient.post<LogoutResponseEnvelope>('/auth/logout'),
 
   /**
    * GET /users/me (protected)
-   * Returns the authenticated user profile.
-   * Used by AuthContext to hydrate state on app load.
+   * Backend returns: { success: true, data: { user: { ... } } }
    */
   getProfile: () =>
-    apiClient.get<{ user: { id: string; username: string; currency: string; timezone: string } }>('/users/me'),
+    apiClient.get<ProfileResponseEnvelope>('/users/me'),
 };

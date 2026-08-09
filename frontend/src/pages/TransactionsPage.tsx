@@ -1,20 +1,22 @@
 /**
- * TransactionsPage — the most important feature page in FundWave.
+ * TransactionsPage — the core feature page of FundWave.
  *
  * Architecture:
  *  - All business logic lives in useTransactions hook
+ *  - TransactionSummary: four live stat cards at top
  *  - Desktop: sticky-header table (TransactionTable)
  *  - Mobile:  card list (TransactionCard)
  *  - Filtering / search via TransactionToolbar
  *  - Add / Edit via TransactionModal
  *  - Delete via DeleteDialog
  *  - Toast feedback via ToastContainer
- *  - Loading: skeleton rows
- *  - Empty: beautiful illustrated state
+ *  - Loading: skeleton rows (no spinner-only UI)
+ *  - Empty: illustrated empty state
  */
 
 import { useTransactions } from '@/hooks/useTransactions';
 
+import TransactionSummary   from '@/components/transactions/TransactionSummary';
 import TransactionToolbar   from '@/components/transactions/TransactionToolbar';
 import TransactionTable     from '@/components/transactions/TransactionTable';
 import TransactionCard      from '@/components/transactions/TransactionCard';
@@ -109,7 +111,7 @@ const TransactionsPage = () => {
       <div className="page__header">
         <div>
           <h1 className="page__title">Transactions</h1>
-          <p className="page__subtitle">Track every rupee with clarity.</p>
+          <p className="page__subtitle">Track every transaction with complete clarity.</p>
         </div>
         <button
           type="button"
@@ -122,6 +124,14 @@ const TransactionsPage = () => {
           <span>Add Transaction</span>
         </button>
       </div>
+
+      {/* ── Summary row ───────────────────────────────────────────────────── */}
+      {!error && (
+        <TransactionSummary
+          transactions={transactions}
+          isLoading={isLoading}
+        />
+      )}
 
       {/* ── Error ─────────────────────────────────────────────────────────── */}
       {error && !isLoading && (

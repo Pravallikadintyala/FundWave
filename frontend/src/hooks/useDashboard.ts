@@ -40,7 +40,7 @@ export const useDashboard = (): UseDashboardReturn => {
 
   useEffect(() => {
     void fetch();
-  }, [fetch]);
+  }, []);
 
   return { data, isLoading, error, refetch: fetch };
 };

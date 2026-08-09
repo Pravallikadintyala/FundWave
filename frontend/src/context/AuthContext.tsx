@@ -90,9 +90,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     // Fallback: verify via /users/me
+    // Backend returns: { success: true, data: { user: { id, username, ... } } }
     try {
       const res       = await authService.getProfile();
-      const freshUser = res.data.user;
+      // res.data is the full envelope: { success, data: { user } }
+      const freshUser = res.data.data.user;
       persist(storedToken, {
         id:       freshUser.id,
         username: freshUser.username,
@@ -110,25 +112,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     void checkAuth();
-  }, [checkAuth]);
+  }, []);
 
   // ── login ────────────────────────────────────────────────────────────────────
 
   const login = useCallback(async (payload: LoginPayload) => {
     const res = await authService.login(payload);
-    // Backend returns: { message, token }
-    const { token: newToken } = res.data;
+    // Backend wraps response in { success: true, data: { token, user } }
+    // res.data is the full envelope, so the token is at res.data.data.token
+    const { token: newToken, user: loginUser } = res.data.data;
 
-    // Build a minimal User from the username in the payload.
-    // On next app load, checkAuth() will hydrate from localStorage or /users/me.
-    const minimalUser: User = {
-      id:       '',          // unknown until /users/me is called
-      username: payload.username,
-      currency: 'USD',
-      timezone: 'UTC',
+    // Build the User object from the login response (avoids a /users/me round-trip)
+    const newUser: User = {
+      id:       loginUser.id,
+      username: loginUser.username,
+      fullName: loginUser.fullName,
+      avatar:   loginUser.avatar,
+      currency: loginUser.currency ?? 'USD',
+      timezone: loginUser.timezone ?? 'UTC',
     };
 
-    persist(newToken, minimalUser);
+    persist(newToken, newUser);
   }, []);
 
   // ── register ─────────────────────────────────────────────────────────────────
