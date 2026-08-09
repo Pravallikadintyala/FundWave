@@ -5,7 +5,7 @@
 import { apiClient } from '@/api/axiosClient';
 import type { ApiResponse, AIInsights } from '@/types';
 
-export const aiService = {
+export const aiInsightsService = {
   getInsights: () =>
     apiClient.get<ApiResponse<AIInsights>>('/ai/insights'),
 };

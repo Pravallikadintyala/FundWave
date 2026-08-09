@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { aiService } from '@/services/aiService';
+import { aiInsightsService } from '@/services/aiInsightsService';
 import type { AIInsights } from '@/types';
 
 interface UseAIInsightsReturn {
@@ -24,9 +24,9 @@ export const useAIInsights = (): UseAIInsightsReturn => {
     let cancelled = false;
     const load = async () => {
       try {
-        const res = await aiService.getInsights();
-        const payload = (res.data as unknown as { success: boolean; data: AIInsights });
-        if (!cancelled) setInsights(payload.data);
+        const res = await aiInsightsService.getInsights();
+        const payload = (res.data as unknown as { success: boolean; data: { insights: AIInsights } });
+        if (!cancelled) setInsights(payload.data.insights);
       } catch {
         if (!cancelled) setError('Unable to load insights');
       } finally {

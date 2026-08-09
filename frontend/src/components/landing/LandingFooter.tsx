@@ -1,73 +1,64 @@
 /**
- * LandingFooter — the footer with links and copyright.
+ * LandingFooter — premium footer with CTA section and gradient top border.
  */
 
 import { useNavigate } from 'react-router-dom';
+
+const LogoMark = () => (
+  <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+    <rect width="28" height="28" rx="9" fill="var(--color-primary)" />
+    <path d="M8 14h12M14 8l6 6-6 6" stroke="white" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 const LandingFooter = () => {
   const navigate = useNavigate();
 
   return (
-    <footer className="landing-footer" role="contentinfo">
-      <div className="landing-footer__container">
-        <div className="landing-footer__content">
-          {/* Brand */}
-          <div className="landing-footer__section">
-            <h3 className="landing-footer__brand">FundWave</h3>
-            <p className="landing-footer__tagline">
-              Your finances, smarter by design.
-            </p>
-          </div>
-
-          {/* Links */}
-          <div className="landing-footer__links">
-            <div className="landing-footer__column">
-              <h4 className="landing-footer__column-title">Product</h4>
-              <ul className="landing-footer__list">
-                <li><a href="#features" className="landing-footer__link">Features</a></li>
-                <li><a href="#" className="landing-footer__link">Pricing</a></li>
-              </ul>
-            </div>
-
-            <div className="landing-footer__column">
-              <h4 className="landing-footer__column-title">Company</h4>
-              <ul className="landing-footer__list">
-                <li><a href="#" className="landing-footer__link">About</a></li>
-                <li><a href="#" className="landing-footer__link">Blog</a></li>
-              </ul>
-            </div>
-
-            <div className="landing-footer__column">
-              <h4 className="landing-footer__column-title">Legal</h4>
-              <ul className="landing-footer__list">
-                <li><a href="#" className="landing-footer__link">Privacy</a></li>
-                <li><a href="#" className="landing-footer__link">Terms</a></li>
-              </ul>
+    <footer className="lfooter" role="contentinfo">
+      {/* CTA Banner */}
+      <div className="lfooter__cta">
+        <div className="lfooter__cta-inner">
+          <div className="lfooter__cta-glow" aria-hidden="true" />
+          <div className="lfooter__cta-content">
+            <h2 className="lfooter__cta-title">Ready to take control of your finances?</h2>
+            <p className="lfooter__cta-sub">Join thousands of users who've transformed their financial lives with FundWave.</p>
+            <div className="lfooter__cta-btns">
+              <button className="lfooter__cta-btn lfooter__cta-btn--primary" onClick={() => navigate('/register')}>
+                Start for Free
+              </button>
+              <button className="lfooter__cta-btn lfooter__cta-btn--ghost" onClick={() => navigate('/login')}>
+                Sign In
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Bottom bar */}
-        <div className="landing-footer__bottom">
-          <p className="landing-footer__copyright">
-            © 2026 FundWave. All rights reserved.
-          </p>
-          <div className="landing-footer__bottom-links">
-            <button
-              type="button"
-              className="landing-footer__bottom-link"
-              onClick={() => navigate('/login')}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              className="landing-footer__bottom-link landing-footer__bottom-link--primary"
-              onClick={() => navigate('/register')}
-            >
-              Get Started
-            </button>
+      {/* Footer body */}
+      <div className="lfooter__body">
+        <div className="lfooter__inner">
+          <div className="lfooter__brand">
+            <div className="lfooter__brand-logo">
+              <LogoMark />
+              <span className="lfooter__brand-name">FundWave</span>
+            </div>
+            <p className="lfooter__brand-desc">
+              Your personal finance platform for smarter, AI-powered money management.
+            </p>
           </div>
+
+          <div className="lfooter__contact" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            <div className="lfooter__col-title">Contact</div>
+            <p className="lfooter__brand-desc">
+              Contact us with <a href="mailto:pravallikad730@gmail.com" className="lfooter__link" style={{ textDecoration: 'underline' }}>pravallikad730@gmail.com</a>. This is my personal project.
+            </p>
+          </div>
+        </div>
+
+        <div className="lfooter__bottom">
+          <p className="lfooter__copy">© 2026 FundWave. All rights reserved.</p>
+          <p className="lfooter__made">Made with ♥ for smart finance</p>
         </div>
       </div>
     </footer>

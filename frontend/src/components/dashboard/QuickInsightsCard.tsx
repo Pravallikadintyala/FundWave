@@ -104,7 +104,7 @@ const QuickInsightsCard = ({ insights, isLoading, error }: QuickInsightsCardProp
       <CircularScore score={insights.overallScore} />
       <div className="insights-content">
         <p className="insights-summary">{insights.summary}</p>
-        {insights.recommendations[0] && (
+        {insights.recommendations?.[0] && (
           <div className="insights-rec">
             <span className="insights-rec__label">Top recommendation</span>
             <p className="insights-rec__text">💡 {insights.recommendations[0]}</p>

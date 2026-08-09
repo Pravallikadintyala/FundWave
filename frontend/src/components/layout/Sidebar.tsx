@@ -66,7 +66,7 @@ const navItems = [
   { to: '/dashboard',     label: 'Dashboard',      Icon: DashboardIcon },
   { to: '/transactions',  label: 'Transactions',   Icon: TransactionsIcon },
   { to: '/savings-goals', label: 'Savings Goals',  Icon: SavingsIcon },
-  { to: '/ai-insights',   label: 'AI Insights',    Icon: AIIcon },
+  { to: '/insights',      label: 'AI Insights',    Icon: AIIcon },
   { to: '/profile',       label: 'Profile',        Icon: ProfileIcon },
 ];
 

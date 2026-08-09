@@ -10,7 +10,7 @@ import ForgotPasswordPage    from '@/pages/ForgotPasswordPage';
 import DashboardPage         from '@/pages/DashboardPage';
 import TransactionsPage      from '@/pages/TransactionsPage';
 import SavingsGoalsPage      from '@/pages/SavingsGoalsPage';
-import AIInsightsPage        from '@/pages/AIInsightsPage';
+import Insights              from '@/pages/Insights';
 import ProfilePage           from '@/pages/ProfilePage';
 import NotFoundPage          from '@/pages/NotFoundPage';
 
@@ -49,7 +49,7 @@ const AppRouter = () => (
         <Route path="/dashboard"     element={<DashboardPage />} />
         <Route path="/transactions"  element={<TransactionsPage />} />
         <Route path="/savings-goals" element={<SavingsGoalsPage />} />
-        <Route path="/ai-insights"   element={<AIInsightsPage />} />
+        <Route path="/insights"      element={<Insights />} />
         <Route path="/profile"       element={<ProfilePage />} />
       </Route>
     </Route>
