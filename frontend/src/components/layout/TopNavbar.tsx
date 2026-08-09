@@ -22,13 +22,7 @@ const MoonIcon = () => (
   </svg>
 );
 
-const BellIcon = () => (
-  <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="currentColor"
-    strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="M13 8A4.5 4.5 0 0 0 4 8c0 4-2 5-2 5h13s-2-1-2-5" />
-    <path d="M9.73 14a1.5 1.5 0 0 1-2.46 0" />
-  </svg>
-);
+
 
 const HamburgerIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor"
@@ -64,11 +58,7 @@ const TopNavbar = ({ onMenuToggle }: TopNavbarProps) => {
           {isDark ? <SunIcon /> : <MoonIcon />}
         </button>
 
-        {/* Notifications */}
-        <button className="topnav__icon-btn topnav__notif" aria-label="Notifications">
-          <BellIcon />
-          <span className="topnav__notif-dot" aria-hidden="true" />
-        </button>
+
 
         {/* User menu */}
         <UserMenu />

@@ -15,6 +15,7 @@
  */
 
 import { useTransactions } from '@/hooks/useTransactions';
+import type { CreateTransactionPayload, UpdateTransactionPayload } from '@/services/transactionService';
 
 import TransactionSummary   from '@/components/transactions/TransactionSummary';
 import TransactionToolbar   from '@/components/transactions/TransactionToolbar';
@@ -94,11 +95,12 @@ const TransactionsPage = () => {
   } = useTransactions();
 
   // ── Handlers ────────────────────────────────────────────────────────────────
-  const handleModalSubmit = editingTx
-    ? (payload: Parameters<typeof updateTransaction>[1]) =>
-        updateTransaction(editingTx.id, payload)
-    : (payload: Parameters<typeof createTransaction>[0]) =>
-        createTransaction(payload);
+  const handleModalSubmit = async (payload: CreateTransactionPayload | UpdateTransactionPayload) => {
+    if (editingTx) {
+      return updateTransaction(editingTx.id, payload as UpdateTransactionPayload);
+    }
+    return createTransaction(payload as CreateTransactionPayload);
+  };
 
   const handleDeleteConfirm = () => {
     if (deletingTx) void deleteTransaction(deletingTx.id);

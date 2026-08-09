@@ -12,9 +12,12 @@ interface EmptyTransactionsProps {
   onClear?:    () => void;
 }
 
+import { useAuth } from '@/hooks/useAuth';
+import { getCurrencySymbol } from '@/utils/format';
+
 // ─── Illustration ───────────────────────────────────────────────────────────────
 
-const EmptyIllustration = () => (
+const EmptyIllustration = ({ symbol }: { symbol: string }) => (
   <svg
     width="120"
     height="100"
@@ -37,7 +40,7 @@ const EmptyIllustration = () => (
 
     {/* Floating coin */}
     <circle cx="88" cy="28" r="14" fill="var(--color-warning-muted)" stroke="var(--color-warning)" strokeWidth="1.5" />
-    <text x="88" y="33" textAnchor="middle" fontSize="14" fill="var(--color-warning-fg)" fontWeight="700">₹</text>
+    <text x="88" y="33" textAnchor="middle" fontSize="14" fill="var(--color-warning-fg)" fontWeight="700">{symbol}</text>
 
     {/* Plus badge */}
     <circle cx="90" cy="72" r="12" fill="var(--color-success-muted)" stroke="var(--color-success)" strokeWidth="1.5" />
@@ -67,11 +70,15 @@ const FilterIllustration = () => (
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 
-const EmptyTransactions = ({ hasFilters, onAdd, onClear }: EmptyTransactionsProps) => (
-  <div className="empty-tx" role="region" aria-label="Empty state">
-    <div className="empty-tx__art">
-      {hasFilters ? <FilterIllustration /> : <EmptyIllustration />}
-    </div>
+const EmptyTransactions = ({ hasFilters, onAdd, onClear }: EmptyTransactionsProps) => {
+  const { user } = useAuth();
+  const symbol = getCurrencySymbol(user?.currency);
+
+  return (
+    <div className="empty-tx" role="region" aria-label="Empty state">
+      <div className="empty-tx__art">
+        {hasFilters ? <FilterIllustration /> : <EmptyIllustration symbol={symbol} />}
+      </div>
 
     <h2 className="empty-tx__title">
       {hasFilters ? 'No matching transactions' : 'No transactions yet'}
@@ -94,6 +101,7 @@ const EmptyTransactions = ({ hasFilters, onAdd, onClear }: EmptyTransactionsProp
       </button>
     </div>
   </div>
-);
+  );
+};
 
 export default EmptyTransactions;

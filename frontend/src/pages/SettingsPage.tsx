@@ -1,6 +1,6 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Card, CardBody, Avatar, Button, Input } from '@/components/ui';
+import { Card, CardBody, Button, Input } from '@/components/ui';
 import { authService, UpdateProfilePayload } from '@/services/authService';
 
 const SUPPORTED_CURRENCIES = [
@@ -94,7 +94,6 @@ const SettingsPage = () => {
     }
   };
 
-  const displayName = formData.fullName || user?.username || 'User';
 
   return (
     <div className="page page-enter">
@@ -106,10 +105,10 @@ const SettingsPage = () => {
       </div>
 
       <div className="profile-grid">
-        {/* Profile Card */}
+        {/* Personal Information */}
         <Card variant="elevated" padding="lg" className="profile-grid__identity">
           <CardBody>
-            <h2 className="card-section-title" style={{ marginBottom: 'var(--space-5)' }}>Profile</h2>
+            <h2 className="card-section-title" style={{ marginBottom: 'var(--space-5)' }}>Personal Information</h2>
             
             {feedback && (
               <div style={{
@@ -125,19 +124,6 @@ const SettingsPage = () => {
             )}
 
             <form onSubmit={handleSave} className="settings-form">
-              <div className="settings-form__avatar-row" style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
-                <Avatar name={displayName} src={formData.avatar} size="xl" />
-                <div style={{ flex: 1 }}>
-                  <Input 
-                    label="Avatar URL (Optional)" 
-                    name="avatar"
-                    value={formData.avatar} 
-                    onChange={handleChange}
-                    placeholder="https://example.com/avatar.png"
-                  />
-                </div>
-              </div>
-
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
                 <Input 
                   label="Full Name" 
@@ -147,7 +133,10 @@ const SettingsPage = () => {
                   placeholder="e.g. Jane Doe"
                   required
                 />
-                
+              </div>
+
+              <h2 className="card-section-title" style={{ marginTop: 'var(--space-6)', marginBottom: 'var(--space-5)' }}>Financial Preferences</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
                 <div className="input-wrapper">
                   <label htmlFor="currency" className="input-label">Currency</label>
                   <select 
@@ -179,10 +168,26 @@ const SettingsPage = () => {
                 </div>
               </div>
 
-              <Button type="submit" variant="primary" disabled={isSaving} isLoading={isSaving}>
+              <Button type="submit" variant="primary" disabled={isSaving} loading={isSaving}>
                 Save Changes
               </Button>
             </form>
+          </CardBody>
+        </Card>
+
+        {/* Contact Information */}
+        <Card variant="default" padding="lg">
+          <CardBody>
+            <h2 className="card-section-title" style={{ marginBottom: 'var(--space-5)' }}>Contact Information</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <Input 
+                label="Email" 
+                value={user?.username ?? ''} 
+                readOnly
+                disabled
+                helperText="Email address cannot be changed."
+              />
+            </div>
           </CardBody>
         </Card>
 

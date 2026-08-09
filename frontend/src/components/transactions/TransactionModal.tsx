@@ -11,6 +11,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
+import { getCurrencySymbol } from '@/utils/format';
 import type { Transaction, Category } from '@/types';
 import type { CreateTransactionPayload, UpdateTransactionPayload } from '@/services/transactionService';
 
@@ -80,6 +82,8 @@ const TransactionModal = ({
   const [form, setForm]         = useState<FormState>(initForm(editingTx));
   const [errors, setErrors]     = useState<FormErrors>({});
   const [submitting, setSubmit] = useState(false);
+  const { user } = useAuth();
+  const currencySymbol = getCurrencySymbol(user?.currency);
   const amountRef               = useRef<HTMLInputElement>(null);
 
   const amountId   = useId();
@@ -206,7 +210,7 @@ const TransactionModal = ({
               Amount <span aria-hidden="true">*</span>
             </label>
             <div className="txmodal-form__amount-wrap">
-              <span className="txmodal-form__currency" aria-hidden="true">₹</span>
+              <span className="txmodal-form__currency" aria-hidden="true">{currencySymbol}</span>
               <input
                 ref={amountRef}
                 id={amountId}

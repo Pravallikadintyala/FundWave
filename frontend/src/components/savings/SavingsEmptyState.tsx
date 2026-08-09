@@ -6,10 +6,12 @@
  */
 
 import type { GoalFilter } from '@/hooks/useSavingsGoals';
+import { useAuth } from '@/hooks/useAuth';
+import { getCurrencySymbol } from '@/utils/format';
 
 // ─── Illustrations ─────────────────────────────────────────────────────────────
 
-const PiggyIllustration = () => (
+const PiggyIllustration = ({ symbol }: { symbol: string }) => (
   <svg width="132" height="108" viewBox="0 0 132 108" fill="none" aria-hidden="true">
     {/* Coin stack */}
     <ellipse cx="30" cy="92" rx="20" ry="6" fill="var(--color-warning-muted)" stroke="var(--color-warning)" strokeWidth="1.4" />
@@ -22,8 +24,8 @@ const PiggyIllustration = () => (
     <path d="M60 74h56" stroke="var(--color-primary)" strokeWidth="1.6" opacity="0.3" />
     {/* Jar lid */}
     <rect x="68" y="22" width="40" height="12" rx="6" fill="var(--color-primary)" opacity="0.85" />
-    {/* Rupee mark */}
-    <text x="88" y="58" textAnchor="middle" fontSize="22" fontWeight="700" fill="var(--color-primary)">₹</text>
+    {/* Currency mark */}
+    <text x="88" y="58" textAnchor="middle" fontSize="22" fontWeight="700" fill="var(--color-primary)">{symbol}</text>
 
     {/* Falling coin */}
     <circle cx="88" cy="10" r="9" fill="var(--color-success-muted)" stroke="var(--color-success)" strokeWidth="1.5" />
@@ -62,6 +64,9 @@ const FILTER_COPY: Record<Exclude<GoalFilter, 'all'>, { title: string; desc: str
 };
 
 const SavingsEmptyState = ({ filter, onCreate, onShowAll }: SavingsEmptyStateProps) => {
+  const { user } = useAuth();
+  const symbol = getCurrencySymbol(user?.currency);
+
   if (filter !== 'all') {
     const copy = FILTER_COPY[filter];
     return (
@@ -83,7 +88,7 @@ const SavingsEmptyState = ({ filter, onCreate, onShowAll }: SavingsEmptyStatePro
 
   return (
     <section className="empty-tx" aria-label="No savings goals yet">
-      <div className="empty-tx__art"><PiggyIllustration /></div>
+      <div className="empty-tx__art"><PiggyIllustration symbol={symbol} /></div>
       <h2 className="empty-tx__title">Start saving for something that matters.</h2>
       <p className="empty-tx__desc">
         Set a target, track every contribution, and watch your progress build. Your first goal takes

@@ -19,7 +19,8 @@ import {
   DEFAULT_GOAL_ICON,
   accentForGoal,
 } from '@/components/savings/goalPresets';
-import { formatCurrency, toDateInputValue, todayInputValue } from '@/utils/format';
+import { getCurrencySymbol, formatCurrency, toDateInputValue, todayInputValue } from '@/utils/format';
+import { useAuth } from '@/hooks/useAuth';
 import type { MutationResult } from '@/hooks/useSavingsGoals';
 import type {
   CreateSavingsGoalPayload,
@@ -74,6 +75,9 @@ const SavingsGoalModal = ({
   const [errors, setErrors]         = useState<FormErrors>({});
   const [formError, setFormError]   = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const { user } = useAuth();
+  const currencySymbol = getCurrencySymbol(user?.currency);
 
   const titleId  = useId();
   const amountId = useId();
@@ -249,7 +253,7 @@ const SavingsGoalModal = ({
               Target amount <span aria-hidden="true">*</span>
             </label>
             <div className="txmodal-form__amount-wrap">
-              <span className="txmodal-form__currency" aria-hidden="true">₹</span>
+              <span className="txmodal-form__currency" aria-hidden="true">{currencySymbol}</span>
               <input
                 id={amountId}
                 type="number"

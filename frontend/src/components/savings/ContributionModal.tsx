@@ -12,7 +12,8 @@ import { useEffect, useId, useState, type CSSProperties, type FormEvent } from '
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { accentForGoal, DEFAULT_GOAL_ICON } from '@/components/savings/goalPresets';
-import { formatCurrency } from '@/utils/format';
+import { formatCurrency, getCurrencySymbol } from '@/utils/format';
+import { useAuth } from '@/hooks/useAuth';
 import type { MutationResult } from '@/hooks/useSavingsGoals';
 import type { SavingsGoal } from '@/types';
 
@@ -29,6 +30,11 @@ interface ContributionModalProps {
 const ContributionModal = ({ open, goal, onClose, onSubmit }: ContributionModalProps) => {
   const [amount, setAmount]         = useState('');
   const [error, setError]           = useState<string | null>(null);
+
+  const { user } = useAuth();
+  const currencySymbol = getCurrencySymbol(user?.currency);
+
+  const remaining = goal ? round2(goal.targetAmount - goal.currentAmount) : 0;
   const [formError, setFormError]   = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -45,7 +51,6 @@ const ContributionModal = ({ open, goal, onClose, onSubmit }: ContributionModalP
 
   if (!goal) return null;
 
-  const remaining = round2(goal.remainingAmount);
   const parsed    = Number(amount);
   const isNumeric = amount.trim() !== '' && !Number.isNaN(parsed);
   const newTotal  = isNumeric ? round2(Math.min(goal.currentAmount + parsed, goal.targetAmount)) : goal.currentAmount;
@@ -126,8 +131,8 @@ const ContributionModal = ({ open, goal, onClose, onSubmit }: ContributionModalP
           <label htmlFor={amountId} className="txmodal-form__label">
             Amount <span aria-hidden="true">*</span>
           </label>
-          <div className="txmodal-form__amount-wrap">
-            <span className="txmodal-form__currency" aria-hidden="true">₹</span>
+          <div className="txmodal-form__amount-wrap" style={{ marginTop: 'var(--space-2)' }}>
+            <span className="txmodal-form__currency" aria-hidden="true">{currencySymbol}</span>
             <input
               id={amountId}
               type="number"

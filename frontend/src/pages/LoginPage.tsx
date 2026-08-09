@@ -159,8 +159,8 @@ const LoginPage = () => {
   };
 
   // ── Derived UI state ──────────────────────────────────────────────────────────
-  const fieldError = (field: keyof FormState) =>
-    touched[field] ? errors[field] : undefined;
+  const fieldError = (field: keyof FormErrors) =>
+    touched[field as keyof FormState] ? errors[field] : undefined;
 
   return (
     <div className="auth-form-container" role="main">

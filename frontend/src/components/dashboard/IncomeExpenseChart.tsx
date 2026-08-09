@@ -15,18 +15,11 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { MonthlyIncomeVsExpense } from '@/types';
+import { formatCurrency, formatCompactCurrency } from '@/utils/format';
 
-// ── Formatters ────────────────────────────────────────────────────────────────
+const fmtCurrency = (n: number): string => formatCompactCurrency(n);
 
-const fmtCurrency = (n: number): string =>
-  n >= 1_00_000
-    ? `₹${(n / 1_00_000).toFixed(1)}L`
-    : n >= 1000
-    ? `₹${(n / 1000).toFixed(0)}K`
-    : `₹${n}`;
-
-const fmtFull = (n: number): string =>
-  new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
+const fmtFull = (n: number): string => formatCurrency(n);
 
 // ── Custom tooltip ────────────────────────────────────────────────────────────
 

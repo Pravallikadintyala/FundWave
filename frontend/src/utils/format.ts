@@ -4,28 +4,61 @@
  * Kept framework-free so both hooks and components can use them.
  */
 
-const INR = (fractionDigits: number): Intl.NumberFormat =>
-  new Intl.NumberFormat('en-IN', {
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  INR: '₹',
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  AED: 'د.إ',
+  SGD: 'S$',
+  AUD: 'A$',
+  CAD: 'C$',
+  JPY: '¥',
+  CHF: 'CHF',
+};
+
+export const getCurrencySymbol = (currencyCode: string = 'INR'): string => {
+  return CURRENCY_SYMBOLS[currencyCode] || currencyCode;
+};
+
+const getFormatter = (currency: string, fractionDigits: number): Intl.NumberFormat =>
+  new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'INR',
+    currency: currency,
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   });
 
+const getUserCurrency = (): string => {
+  try {
+    const userStr = localStorage.getItem('fundwave_user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      if (user.currency) return user.currency;
+    }
+  } catch (e) {
+    // ignore parse errors
+  }
+  return 'INR';
+};
+
 /**
- * ₹50,000 for whole amounts, ₹1,250.50 when paise are present.
+ * Forms the currency amount with the appropriate symbol.
  * Never rounds away money the user actually saved.
  */
-export const formatCurrency = (value: number): string =>
-  INR(Number.isInteger(value) ? 0 : 2).format(value);
+export const formatCurrency = (value: number, currency?: string): string =>
+  getFormatter(currency || getUserCurrency(), Number.isInteger(value) ? 0 : 2).format(value);
 
-/** Compact form for tight spaces: ₹1.2L, ₹35.0K, ₹850 */
-export const formatCompactCurrency = (value: number): string => {
+/** Compact form for tight spaces */
+export const formatCompactCurrency = (value: number, currency?: string): string => {
+  const resolvedCurrency = currency || getUserCurrency();
   const abs = Math.abs(value);
-  if (abs >= 10_000_000) return `₹${(value / 10_000_000).toFixed(1)}Cr`;
-  if (abs >= 100_000)    return `₹${(value / 100_000).toFixed(1)}L`;
-  if (abs >= 1_000)      return `₹${(value / 1_000).toFixed(1)}K`;
-  return formatCurrency(value);
+  const symbol = getCurrencySymbol(resolvedCurrency);
+  
+  if (abs >= 10_000_000) return `${symbol}${(value / 10_000_000).toFixed(1)}Cr`;
+  if (abs >= 100_000)    return `${symbol}${(value / 100_000).toFixed(1)}L`;
+  if (abs >= 1_000)      return `${symbol}${(value / 1_000).toFixed(1)}K`;
+  return formatCurrency(value, resolvedCurrency);
 };
 
 /** 12 Aug 2026 */
