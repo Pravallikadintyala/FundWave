@@ -13,7 +13,7 @@ import { Types } from 'mongoose';
 /** Shape of the payload encoded inside the JWT. */
 export interface JwtPayload {
   id: string;
-  username: string;
+  email: string;
   iat?: number;
   exp?: number;
 }
@@ -22,13 +22,14 @@ export interface JwtPayload {
 
 /** POST /api/auth/signup */
 export interface SignupBody {
-  username: string;
+  fullName: string;
+  email: string;
   password: string;
 }
 
 /** POST /api/auth/login */
 export interface LoginBody {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -37,7 +38,7 @@ export interface LoginBody {
 /** Public user object — password is never included. */
 export interface PublicUser {
   id: string;
-  username: string;
+  email: string;
   fullName?: string;
   avatar?: string;
   currency: string;
@@ -72,8 +73,11 @@ export interface AuthenticatedRequest extends Request {
 /** Shape of a User document stored in MongoDB. */
 export interface IUser {
   _id: Types.ObjectId;
-  username: string;
-  password: string;
+  email: string;
+  password?: string;
+  authProvider: 'local' | 'google';
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
   // ─── Profile fields ──────────────────────────────
   fullName?: string;
   avatar?: string;

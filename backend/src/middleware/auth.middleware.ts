@@ -25,9 +25,9 @@ const isJwtPayload = (value: unknown): value is JwtPayload => {
     typeof value === 'object' &&
     value !== null &&
     'id' in value &&
-    'username' in value &&
+    'email' in value &&
     typeof (value as JwtPayload).id === 'string' &&
-    typeof (value as JwtPayload).username === 'string'
+    typeof (value as JwtPayload).email === 'string'
   );
 };
 

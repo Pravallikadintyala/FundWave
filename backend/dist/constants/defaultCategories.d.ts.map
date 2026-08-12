@@ -1,0 +1,1 @@
+{"version":3,"file":"defaultCategories.d.ts","sourceRoot":"","sources":["../../src/constants/defaultCategories.ts"],"names":[],"mappings":"AAOA,OAAO,EAAE,eAAe,EAAE,MAAM,wBAAwB,CAAC;AAEzD,UAAU,eAAe;IACvB,IAAI,EAAE,MAAM,CAAC;IACb,IAAI,EAAE,eAAe,CAAC;IACtB,IAAI,EAAE,MAAM,CAAC;IACb,KAAK,EAAE,MAAM,CAAC;CACf;AAED,eAAO,MAAM,kBAAkB,EAAE,eAAe,EAoB/C,CAAC"}

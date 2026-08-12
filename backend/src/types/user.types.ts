@@ -55,7 +55,7 @@ export interface UpdateProfileBody {
 /** Full user profile returned from GET /api/users/me and PUT /api/users/me */
 export interface UserProfileData {
   id: string;
-  username: string;
+  email: string;
   fullName?: string;
   avatar?: string;
   currency: string;

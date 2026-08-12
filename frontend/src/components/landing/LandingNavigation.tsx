@@ -47,7 +47,7 @@ const LandingNavigation = () => {
 
   const initials = user?.fullName
     ? user.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-    : (user?.username || 'U')[0].toUpperCase();
+    : (user?.email || 'U')[0].toUpperCase();
 
   return (
     <nav className={['lnav', scrolled ? 'lnav--scrolled' : ''].filter(Boolean).join(' ')} role="navigation" aria-label="Main navigation">
@@ -86,7 +86,7 @@ const LandingNavigation = () => {
                 aria-haspopup="menu"
               >
                 <span className="lnav__avatar">{initials}</span>
-                <span className="lnav__user-name">{user?.fullName?.split(' ')[0] ?? user?.username}</span>
+                <span className="lnav__user-name">{user?.fullName ?? user?.email}</span>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
                   <path d="M2 4l4 4 4-4" />
                 </svg>

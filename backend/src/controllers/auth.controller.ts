@@ -1,31 +1,23 @@
 /**
  * Auth controller — thin HTTP layer over the auth service.
- *
- * Migrated from: backend/controllers/authController.js
- *
- * Per CLAUDE.md: controllers only validate requests and call services.
- * All business logic lives in src/services/auth.service.ts.
- *
- * Improvements over the original:
- *  - No inline business logic
- *  - asyncHandler eliminates try/catch boilerplate
- *  - sendSuccess / sendError enforce standardized response envelopes
- *  - Password field is NEVER referenced here (service handles that)
- *  - Typed request bodies
  */
 
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/response';
 import { HTTP_STATUS } from '../constants';
-import { signupUser, loginUser, logoutUser } from '../services/auth.service';
+import { 
+  signupUser, 
+  loginUser, 
+  logoutUser, 
+  getGoogleAuthUrl, 
+  handleGoogleCallback,
+  forgotPassword,
+  resetPassword
+} from '../services/auth.service';
 import { AuthenticatedRequest, SignupBody, LoginBody } from '../types/auth.types';
 import { AppError } from '../utils/AppError';
 
-/**
- * POST /api/auth/signup
- * Public — no auth required.
- */
 export const signup = asyncHandler(
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const body = req.body as SignupBody;
@@ -34,10 +26,6 @@ export const signup = asyncHandler(
   },
 );
 
-/**
- * POST /api/auth/login
- * Public — no auth required.
- */
 export const login = asyncHandler(
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const body = req.body as LoginBody;
@@ -46,15 +34,9 @@ export const login = asyncHandler(
   },
 );
 
-/**
- * POST /api/auth/logout
- * Protected — requires valid Bearer token.
- */
 export const logout = asyncHandler(
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const authHeader = req.headers.authorization;
-    // Guard: protect middleware guarantees this header exists and is valid,
-    // but we check defensively to satisfy TypeScript.
     if (!authHeader) {
       throw new AppError('No token provided', HTTP_STATUS.UNAUTHORIZED);
     }
@@ -65,11 +47,70 @@ export const logout = asyncHandler(
   },
 );
 
-/**
- * GET /api/auth/profile
- * Protected — returns the authenticated user's public profile.
- * No service call needed — payload is already on req.user from middleware.
- */
 export const getProfile = (req: AuthenticatedRequest, res: Response): void => {
   sendSuccess(res, { user: req.user });
 };
+
+// ─── Google OAuth ─────────────────────────────────────────────────────────────
+
+export const googleAuth = asyncHandler(
+  async (_req: Request, res: Response): Promise<void> => {
+    const url = getGoogleAuthUrl();
+    // In some SPAs, you might return the URL. Here we will directly redirect.
+    res.redirect(url);
+  }
+);
+
+export const googleCallback = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const code = req.query.code as string;
+    
+    if (!code) {
+      res.redirect('http://localhost:5173/login?error=oauth_failed');
+      return;
+    }
+
+    try {
+      const data = await handleGoogleCallback(code);
+      // Redirect to frontend callback route with token
+      res.redirect(`http://localhost:5173/auth/callback?token=${data.token}`);
+    } catch (err) {
+      // Log the full error so it is visible in the backend terminal
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error('[Google OAuth] Callback failed:', errMsg);
+      if (err instanceof Error && err.stack) {
+        console.error('[Google OAuth] Stack:', err.stack);
+      }
+      res.redirect(`http://localhost:5173/login?error=oauth_failed&reason=${encodeURIComponent(errMsg)}`);
+    }
+  }
+);
+
+// ─── Password Reset ───────────────────────────────────────────────────────────
+
+export const requestPasswordReset = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { email } = req.body;
+    
+    if (!email) {
+      throw new AppError('Email is required', HTTP_STATUS.BAD_REQUEST);
+    }
+
+    await forgotPassword(email);
+    // Always return success even if email doesn't exist
+    sendSuccess(res, { message: 'If an account with that email exists, we sent a password reset link.' });
+  }
+);
+
+export const confirmPasswordReset = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { token, newPassword } = req.body;
+    
+    if (!token || !newPassword) {
+      throw new AppError('Token and new password are required', HTTP_STATUS.BAD_REQUEST);
+    }
+
+    await resetPassword(token, newPassword);
+    sendSuccess(res, { message: 'Password has been reset successfully.' });
+  }
+);

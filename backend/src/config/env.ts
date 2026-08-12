@@ -22,4 +22,14 @@ export const config = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   isDevelopment: (process.env.NODE_ENV ?? 'development') === 'development',
   isProduction: process.env.NODE_ENV === 'production',
+  
+  googleClientId: process.env.GOOGLE_CLIENT_ID || '',
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+  googleCallbackUrl: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5173/auth/callback',
+
+  smtpHost: process.env.SMTP_HOST || '',
+  smtpPort: parseInt(process.env.SMTP_PORT || '2525', 10),
+  smtpUser: process.env.SMTP_USER || '',
+  smtpPass: process.env.SMTP_PASS || '',
+  emailFrom: process.env.EMAIL_FROM || 'noreply@fundwave.com',
 } as const;

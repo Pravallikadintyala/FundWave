@@ -139,20 +139,7 @@ const LandingPreview = () => (
         </div>
       </div>
 
-      {/* Stats strip */}
-      <div className="lprev__stats">
-        {[
-          { value: '10K+', label: 'Active users' },
-          { value: '₹50Cr+', label: 'Tracked monthly' },
-          { value: '99.9%', label: 'Uptime' },
-          { value: '4.9★', label: 'User rating' },
-        ].map(s => (
-          <div key={s.label} className="lprev__stat">
-            <div className="lprev__stat-value">{s.value}</div>
-            <div className="lprev__stat-label">{s.label}</div>
-          </div>
-        ))}
-      </div>
+
     </div>
   </section>
 );

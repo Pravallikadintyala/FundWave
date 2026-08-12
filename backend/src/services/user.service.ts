@@ -27,7 +27,7 @@ import {
  */
 const toProfileData = (user: {
   _id: { toString(): string };
-  username: string;
+  email: string;
   fullName?: string;
   avatar?: string;
   currency: string;
@@ -36,7 +36,7 @@ const toProfileData = (user: {
   updatedAt?: Date;
 }): UserProfileData => ({
   id: user._id.toString(),
-  username: user.username,
+  email: user.email,
   fullName: user.fullName,
   avatar: user.avatar,
   currency: user.currency,

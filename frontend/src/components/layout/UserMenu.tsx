@@ -44,11 +44,11 @@ const UserMenu = () => {
       trigger={
         <button className="user-menu-trigger" aria-label="User menu">
           <Avatar
-            name={user?.fullName ?? user?.username ?? 'User'}
+            name={user?.fullName ?? user?.email ?? 'User'}
             size="sm"
           />
           <span className="user-menu-trigger__name">
-            {user?.fullName ?? user?.username ?? 'Account'}
+            {user?.fullName ?? user?.email ?? 'Account'}
           </span>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor"
             strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

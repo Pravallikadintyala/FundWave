@@ -70,7 +70,7 @@ const SettingsPage = () => {
       // Map the response to our Auth Context user type
       updateUser({
         id: updatedUser.id,
-        username: updatedUser.username,
+        email: updatedUser.email,
         fullName: updatedUser.fullName,
         avatar: updatedUser.avatar,
         currency: updatedUser.currency,
@@ -182,7 +182,7 @@ const SettingsPage = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               <Input 
                 label="Email" 
-                value={user?.username ?? ''} 
+                value={user?.email ?? ''} 
                 readOnly
                 disabled
                 helperText="Email address cannot be changed."

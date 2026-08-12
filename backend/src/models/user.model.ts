@@ -16,18 +16,31 @@ import { SUPPORTED_CURRENCIES, SUPPORTED_TIMEZONES } from '../types/user.types';
 
 const userSchema = new Schema<IUser>(
   {
-    username: {
+    email: {
       type: String,
-      required: [true, 'Username is required'],
+      required: [true, 'Email is required'],
       unique: true,
       trim: true,
-      minlength: [3, 'Username must be at least 3 characters'],
-      maxlength: [30, 'Username must be at most 30 characters'],
+      lowercase: true,
+      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email address'],
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
-      select: false, // never returned in queries unless explicitly requested
+      // Not required for Google OAuth users
+      select: false,
+    },
+    authProvider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local',
+    },
+    resetPasswordToken: {
+      type: String,
+      select: false,
+    },
+    resetPasswordExpires: {
+      type: Date,
+      select: false,
     },
     // ─── Profile fields ────────────────────────────────────────────────────
     fullName: {

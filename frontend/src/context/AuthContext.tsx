@@ -29,11 +29,12 @@ const USER_KEY  = 'fundwave_user';
 // ─── Context shape ─────────────────────────────────────────────────────────────
 
 interface AuthContextValue extends AuthState {
-  login:     (payload: LoginPayload) => Promise<void>;
-  register:  (payload: RegisterPayload) => Promise<void>;
-  logout:    () => Promise<void>;
-  checkAuth: () => Promise<void>;
-  updateUser: (newUser: User) => void;
+  login:          (payload: LoginPayload) => Promise<void>;
+  register:       (payload: RegisterPayload) => Promise<void>;
+  logout:         () => Promise<void>;
+  checkAuth:      () => Promise<void>;
+  loginWithToken: (token: string) => Promise<void>;
+  updateUser:     (newUser: User) => void;
 }
 
 // ─── Context ───────────────────────────────────────────────────────────────────
@@ -98,7 +99,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const freshUser = res.data.data.user;
       persist(storedToken, {
         id:       freshUser.id,
-        username: freshUser.username,
+        email:    freshUser.email,
         currency: freshUser.currency ?? 'USD',
         timezone: freshUser.timezone ?? 'UTC',
       });
@@ -126,7 +127,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Build the User object from the login response (avoids a /users/me round-trip)
     const newUser: User = {
       id:       loginUser.id,
-      username: loginUser.username,
+      email:    loginUser.email,
       fullName: loginUser.fullName,
       avatar:   loginUser.avatar,
       currency: loginUser.currency ?? 'USD',
@@ -134,6 +135,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     persist(newToken, newUser);
+  }, []);
+
+  // ── loginWithToken — for OAuth callbacks ─────────────────────────────────────
+
+  /**
+   * Accepts a raw JWT (e.g. from an OAuth redirect URL), fetches the user
+   * profile from /users/me to validate it, then calls persist() to update
+   * both localStorage and React state atomically.
+   *
+   * This is intentionally separate from checkAuth() to avoid the cached-user
+   * early-return that would skip profile validation for a brand-new token.
+   */
+  const loginWithToken = useCallback(async (rawToken: string): Promise<void> => {
+    // Temporarily write the token so axiosClient can read it for the /users/me call
+    localStorage.setItem(TOKEN_KEY, rawToken);
+    localStorage.removeItem(USER_KEY);
+
+    try {
+      const res       = await authService.getProfile();
+      const freshUser = res.data.data.user;
+      persist(rawToken, {
+        id:       freshUser.id,
+        email:    freshUser.email,
+        fullName: freshUser.fullName,
+        avatar:   freshUser.avatar,
+        currency: freshUser.currency ?? 'USD',
+        timezone: freshUser.timezone ?? 'UTC',
+      });
+    } catch {
+      // Token was invalid — clean up and surface the error to the caller
+      clear();
+      throw new Error('Invalid token received from OAuth provider');
+    }
   }, []);
 
   // ── register ─────────────────────────────────────────────────────────────────
@@ -176,9 +210,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       register,
       logout,
       checkAuth,
+      loginWithToken,
       updateUser,
     }),
-    [user, token, isLoading, login, register, logout, checkAuth, updateUser],
+    [user, token, isLoading, login, register, logout, checkAuth, loginWithToken, updateUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

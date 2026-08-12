@@ -70,8 +70,7 @@ const SectionHeader = ({ title, subtitle, linkTo, linkLabel }: SectionHeaderProp
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  const displayName =
-    user?.fullName?.split(' ')[0] ?? user?.username ?? 'there';
+  const displayName = user?.fullName?.split(' ')[0] ?? user?.email?.split('@')[0] ?? 'there';
 
   const { data, isLoading, error, refetch } = useDashboard();
   const { insights, isLoading: insightsLoading, error: insightsError } = useAIInsights();

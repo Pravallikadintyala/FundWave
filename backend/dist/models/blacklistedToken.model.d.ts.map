@@ -1,0 +1,1 @@
+{"version":3,"file":"blacklistedToken.model.d.ts","sourceRoot":"","sources":["../../src/models/blacklistedToken.model.ts"],"names":[],"mappings":"AAUA,OAAO,EAAiB,KAAK,EAAE,MAAM,UAAU,CAAC;AAChD,OAAO,EAAE,iBAAiB,EAAE,MAAM,qBAAqB,CAAC;AAoBxD,QAAA,MAAM,gBAAgB,EAAE,KAAK,CAAC,iBAAiB,CAG9C,CAAC;AAEF,eAAe,gBAAgB,CAAC"}
