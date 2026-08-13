@@ -62,7 +62,7 @@ const ScoreRing = ({ score = 0 }: { score?: number }) => {
 // ── Component ────────────────────────────────────────────────────────────────
 
 const Insights = () => {
-  const { insights, isLoading, error } = useAIInsights();
+  const { insights, isLoading, isRefreshing, error } = useAIInsights();
 
   // Helper to interpret the score
   const getScoreLabel = (score: number) => {
@@ -80,6 +80,20 @@ const Insights = () => {
           <h1 className="page__title gradient-text">AI Financial Insights</h1>
           <p className="page__subtitle">Understand your financial habits and get personalized recommendations.</p>
         </div>
+        {isRefreshing && insights && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 'var(--space-2)',
+            fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)',
+            animation: 'pulse 2s ease-in-out infinite'
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+              strokeLinecap="round" strokeLinejoin="round"
+              style={{ animation: 'spin 1s linear infinite' }}>
+              <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+            </svg>
+            Updating insights…
+          </div>
+        )}
       </div>
 
       {/* ── Error State ─────────────────────────────────────────────────────── */}
@@ -127,13 +141,29 @@ const Insights = () => {
                   <Skeleton variant="line" lines={2} />
                 </div>
               ) : insights ? (
-                <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center' }}>
-                  <ScoreRing score={insights.overallScore} />
-                  <div>
-                    <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', lineHeight: 1.5 }}>
-                      This score is based on your income, expenses, and savings habits.
-                    </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+                  <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center' }}>
+                    <ScoreRing score={insights.overallScore} />
+                    <div>
+                      <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', lineHeight: 1.5 }}>
+                        This score is based on your income, expenses, and savings habits.
+                      </p>
+                    </div>
                   </div>
+                  <details style={{
+                    backgroundColor: 'var(--color-bg)', padding: 'var(--space-3)',
+                    borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)'
+                  }}>
+                    <summary style={{ cursor: 'pointer', fontWeight: 500, color: 'var(--color-text)', fontSize: 'var(--text-sm)' }}>
+                      How is this calculated?
+                    </summary>
+                    <div style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                      <p><strong>80–100 (Excellent):</strong> Savings rate &gt; 20%, no overspending, active goals.</p>
+                      <p><strong>60–79 (Good):</strong> Savings rate 10–20%, occasional overspending, some goals.</p>
+                      <p><strong>40–59 (Needs Attention):</strong> Savings rate &lt; 10%, frequent overspending, or no goals.</p>
+                      <p><strong>0–39 (Needs Improvement):</strong> Expenses exceed income, no savings, erratic cash flow.</p>
+                    </div>
+                  </details>
                 </div>
               ) : null}
             </CardBody>

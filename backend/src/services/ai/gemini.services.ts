@@ -6,10 +6,10 @@ const ai = new GoogleGenAI({
 
 export async function generateInsight(prompt: string): Promise<string> {
   const response = await ai.models.generateContent({
-    model: "gemini-3.6-flash",
+    model: "gemini-3.5-flash-lite",
     contents: prompt,
   });
 
   return response.text ?? "No response generated.";
 }
-export default generateInsight;
+export default generateInsight;
