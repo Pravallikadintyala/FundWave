@@ -22,7 +22,8 @@ export const config = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   isDevelopment: (process.env.NODE_ENV ?? 'development') === 'development',
   isProduction: process.env.NODE_ENV === 'production',
-  
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+
   googleClientId: process.env.GOOGLE_CLIENT_ID || '',
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
   googleCallbackUrl: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5173/auth/callback',

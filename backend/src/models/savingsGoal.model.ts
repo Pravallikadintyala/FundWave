@@ -61,4 +61,7 @@ const savingsGoalSchema = new Schema<ISavingsGoal>(
 
 const SavingsGoal: Model<ISavingsGoal> = model<ISavingsGoal>('SavingsGoal', savingsGoalSchema);
 
+// Compound index: supports getSavingsGoals(userId) which sorts by createdAt DESC
+savingsGoalSchema.index({ user: 1, createdAt: -1 });
+
 export default SavingsGoal;

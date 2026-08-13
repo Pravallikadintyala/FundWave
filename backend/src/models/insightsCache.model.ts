@@ -6,10 +6,10 @@
  * delete stale documents — no manual cleanup needed.
  */
 
-import { Schema, model, Model } from 'mongoose';
+import { Schema, model, Model, Types } from 'mongoose';
 
 export interface IInsightsCache {
-  user: Schema.Types.ObjectId;
+  user: Types.ObjectId;
   data: Record<string, unknown>;
   transactionCount: number;
   expiresAt: Date;

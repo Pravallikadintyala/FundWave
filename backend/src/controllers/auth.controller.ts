@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { sendSuccess } from '../utils/response';
 import { HTTP_STATUS } from '../constants';
+import { config } from '../config/env';
 import { 
   signupUser, 
   loginUser, 
@@ -66,14 +67,14 @@ export const googleCallback = asyncHandler(
     const code = req.query.code as string;
     
     if (!code) {
-      res.redirect('http://localhost:5173/login?error=oauth_failed');
+      res.redirect(`${config.frontendUrl}/login?error=oauth_failed`);
       return;
     }
 
     try {
       const data = await handleGoogleCallback(code);
       // Redirect to frontend callback route with token
-      res.redirect(`http://localhost:5173/auth/callback?token=${data.token}`);
+      res.redirect(`${config.frontendUrl}/auth/callback?token=${data.token}`);
     } catch (err) {
       // Log the full error so it is visible in the backend terminal
       const errMsg = err instanceof Error ? err.message : String(err);
@@ -81,7 +82,7 @@ export const googleCallback = asyncHandler(
       if (err instanceof Error && err.stack) {
         console.error('[Google OAuth] Stack:', err.stack);
       }
-      res.redirect(`http://localhost:5173/login?error=oauth_failed&reason=${encodeURIComponent(errMsg)}`);
+      res.redirect(`${config.frontendUrl}/login?error=oauth_failed&reason=${encodeURIComponent(errMsg)}`);
     }
   }
 );

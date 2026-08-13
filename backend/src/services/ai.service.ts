@@ -14,6 +14,7 @@ import generateInsight from './ai/gemini.services';
 import { AIInsightsData, FinancialContext } from '../types/ai.types';
 import { TransactionData } from '../types/finance.types';
 import InsightsCache from '../models/insightsCache.model';
+import { Types } from 'mongoose';
 
 // ─── Fallback responses ───────────────────────────────────────────────────────
 
@@ -240,7 +241,7 @@ export const getAIInsights = async (userId: string): Promise<AIInsightsData> => 
   }
 
   // ── Check MongoDB cache ───────────────────────────────────────────────────
-  const cached = await InsightsCache.findOne({ user: userId }).lean();
+  const cached = await InsightsCache.findOne({ user: new Types.ObjectId(userId) }).lean();
   const now = Date.now();
 
   if (
@@ -270,7 +271,7 @@ export const getAIInsights = async (userId: string): Promise<AIInsightsData> => 
 
     // Upsert cache — one doc per user, auto-deleted by MongoDB TTL index after 24h
     await InsightsCache.findOneAndUpdate(
-      { user: userId },
+      { user: new Types.ObjectId(userId) },
       {
         data: parsed as unknown as Record<string, unknown>,
         transactionCount,

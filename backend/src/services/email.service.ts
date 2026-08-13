@@ -11,8 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendPasswordResetEmail = async (to: string, resetToken: string) => {
-  // In a real application, this would point to the frontend reset-password route
-  const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}`;
+  const resetUrl = `${config.frontendUrl}/reset-password?token=${resetToken}`;
 
   const mailOptions = {
     from: config.emailFrom,
