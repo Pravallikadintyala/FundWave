@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAIInsights = void 0;
 const dashboard_service_1 = require("./dashboard.service");
 const gemini_services_1 = __importDefault(require("./ai/gemini.services"));
+const insightsCache_model_1 = __importDefault(require("../models/insightsCache.model"));
+const mongoose_1 = require("mongoose");
 const FALLBACK = {
     summary: 'We were unable to generate personalised insights at this time. Please try again shortly.',
     strengths: ['You are tracking your finances — that is already a great habit.'],
@@ -19,13 +21,13 @@ const FALLBACK = {
     overallScore: 0,
 };
 const LOW_ACTIVITY = {
-    summary: 'Not enough financial activity was found to generate detailed insights. Start by logging your income and expenses.',
-    strengths: ['You have set up your FundWave account — you are on the right track.'],
+    summary: 'Not enough financial activity was found to generate detailed insights. Start by logging your income and expenses to unlock personalized AI analysis.',
+    strengths: ['You have set up your FundWave account — you are already ahead of most people.'],
     concerns: ['Very few or no transactions recorded yet.'],
     recommendations: [
-        'Log your first income or expense transaction.',
-        'Create at least one savings goal.',
-        'Categorise your spending to see where your money goes.',
+        'Log your first income or expense transaction to get started.',
+        'Create at least one savings goal with a target date.',
+        'Categorise your spending so you can see exactly where your money goes.',
     ],
     savingsTip: 'The best time to start tracking your finances was yesterday. The second best time is now.',
     overallScore: 0,
@@ -36,7 +38,7 @@ const buildRecentSummary = (recent) => {
     return recent
         .map((tx) => {
         const cat = tx.category && typeof tx.category === 'object' ? tx.category.name : 'Uncategorised';
-        return `${tx.type} ₹${tx.amount} (${cat})`;
+        return `${tx.type} ₹${tx.amount.toLocaleString('en-IN')} in ${cat} — "${tx.description || 'no description'}"`;
     })
         .join('; ');
 };
@@ -45,68 +47,134 @@ const buildContext = (dashboardData) => ({
     totalExpenses: dashboardData.summary.totalExpenses,
     currentBalance: dashboardData.summary.currentBalance,
     transactionCount: dashboardData.summary.transactionCount,
-    topExpenseCategories: dashboardData.expenseByCategory.slice(0, 5),
+    topExpenseCategories: dashboardData.expenseByCategory.slice(0, 6),
     monthlyTrend: dashboardData.incomeVsExpense.slice(-6),
     savingsGoals: dashboardData.savings,
     recentTransactionSummary: buildRecentSummary(dashboardData.recentTransactions),
 });
-const buildPrompt = (ctx) => `
-You are a personal finance advisor AI. Analyse the following summarised financial data and respond with a JSON object only — no markdown, no explanation, no code fences.
+const buildPrompt = (ctx) => {
+    const fmt = (n) => `₹${n.toLocaleString('en-IN')}`;
+    const savingsRate = ctx.totalIncome > 0
+        ? (((ctx.totalIncome - ctx.totalExpenses) / ctx.totalIncome) * 100).toFixed(1)
+        : '0.0';
+    const expenseRatio = ctx.totalIncome > 0
+        ? ((ctx.totalExpenses / ctx.totalIncome) * 100).toFixed(1)
+        : '0.0';
+    const avgMonthlyIncome = ctx.monthlyTrend.length > 0
+        ? Math.round(ctx.monthlyTrend.reduce((s, m) => s + m.income, 0) / ctx.monthlyTrend.length)
+        : 0;
+    const avgMonthlyExpense = ctx.monthlyTrend.length > 0
+        ? Math.round(ctx.monthlyTrend.reduce((s, m) => s + m.expense, 0) / ctx.monthlyTrend.length)
+        : 0;
+    const overspendMonths = ctx.monthlyTrend.filter((m) => m.expense > m.income);
+    const topCat = ctx.topExpenseCategories[0];
+    const savingsGoalSection = ctx.savingsGoals.totalGoals === 0
+        ? '  - No savings goals created yet.'
+        : [
+            `  - Total goals: ${ctx.savingsGoals.totalGoals}`,
+            `  - Active goals: ${ctx.savingsGoals.activeGoals}`,
+            `  - Completed goals: ${ctx.savingsGoals.completedGoals}`,
+            `  - Total saved across all goals: ${fmt(ctx.savingsGoals.totalSaved)}`,
+        ].join('\n');
+    const monthlyTrendSection = ctx.monthlyTrend.length === 0
+        ? '  - No monthly data available yet.'
+        : ctx.monthlyTrend
+            .map((m) => {
+            const net = m.income - m.expense;
+            const direction = net >= 0 ? `surplus ${fmt(net)}` : `deficit ${fmt(Math.abs(net))}`;
+            return `  - ${m.month}: income ${fmt(m.income)}, expenses ${fmt(m.expense)} → ${direction}`;
+        })
+            .join('\n');
+    const categorySection = ctx.topExpenseCategories.length === 0
+        ? '  - No expense categories recorded yet.'
+        : ctx.topExpenseCategories
+            .map((c, i) => {
+            const pct = ctx.totalExpenses > 0
+                ? ((c.amount / ctx.totalExpenses) * 100).toFixed(1)
+                : '0.0';
+            return `  ${i + 1}. ${c.category}: ${fmt(c.amount)} (${pct}% of total spending)`;
+        })
+            .join('\n');
+    return `
+You are a highly skilled, empathetic personal finance advisor AI for FundWave — an Indian personal finance app. Your job is to analyse a user's real financial data and generate concise, specific, and actionable insights.
 
-Financial summary:
-- Total income: ₹${ctx.totalIncome}
-- Total expenses: ₹${ctx.totalExpenses}
-- Current balance: ₹${ctx.currentBalance}
-- Total transactions logged: ${ctx.transactionCount}
+=== USER'S FINANCIAL SUMMARY ===
 
-Top expense categories (by amount):
-${ctx.topExpenseCategories.length > 0
-    ? ctx.topExpenseCategories.map((c) => `  - ${c.category}: ₹${c.amount}`).join('\n')
-    : '  - None recorded'}
+OVERALL FIGURES (all-time):
+  - Total income recorded:     ${fmt(ctx.totalIncome)}
+  - Total expenses recorded:   ${fmt(ctx.totalExpenses)}
+  - Current net balance:       ${fmt(ctx.currentBalance)}
+  - Total transactions logged: ${ctx.transactionCount}
 
-Monthly income vs expense trend (recent months):
-${ctx.monthlyTrend.length > 0
-    ? ctx.monthlyTrend.map((m) => `  - ${m.month}: income ₹${m.income}, expense ₹${m.expense}`).join('\n')
-    : '  - No monthly data'}
+KEY DERIVED METRICS:
+  - Savings rate:              ${savingsRate}%  (income minus expenses as % of income)
+  - Expense ratio:             ${expenseRatio}%  (expenses as % of income)
+  - Average monthly income:    ${fmt(avgMonthlyIncome)}
+  - Average monthly expenses:  ${fmt(avgMonthlyExpense)}
+  - Months with overspending:  ${overspendMonths.length > 0 ? overspendMonths.map((m) => m.month).join(', ') : 'None'}
 
-Savings goals:
-- Total goals: ${ctx.savingsGoals.totalGoals}
-- Active goals: ${ctx.savingsGoals.activeGoals}
-- Completed goals: ${ctx.savingsGoals.completedGoals}
-- Total saved across all goals: ₹${ctx.savingsGoals.totalSaved}
+TOP EXPENSE CATEGORIES (ranked by total spend):
+${categorySection}
+${topCat ? `\n  → Biggest spending area: "${topCat.category}" at ${fmt(topCat.amount)}.` : ''}
 
-Recent transactions summary:
-${ctx.recentTransactionSummary}
+MONTHLY INCOME VS EXPENSE TREND (last 6 months):
+${monthlyTrendSection}
 
-Respond ONLY with a JSON object in exactly this structure:
+SAVINGS GOALS:
+${savingsGoalSection}
+
+RECENT TRANSACTIONS (last 5):
+  ${ctx.recentTransactionSummary}
+
+=== YOUR TASK ===
+
+Based on this data, generate personalised financial insights. Be specific — reference real numbers, percentages, and category names. Use INR (₹). Write for an Indian audience.
+
+Scoring guide for overallScore (0–100):
+  - 80–100: Excellent. Savings rate > 20%, no overspending months, active goals.
+  - 60–79:  Good. Savings rate 10–20%, occasional overspending, some goals.
+  - 40–59:  Needs attention. Savings rate < 10%, frequent overspending, or no goals.
+  - 0–39:   Needs improvement. Expenses exceed income, no savings, erratic cash flow.
+
+Adjust the score based on the actual data above. Do not default to a round number.
+
+Respond ONLY with a valid JSON object in exactly this structure (no markdown, no code fences, no explanation text):
 {
-  "summary": "<2-3 sentence overview of the user's financial health>",
-  "strengths": ["<strength 1>", "<strength 2>"],
-  "concerns": ["<concern 1>", "<concern 2>"],
-  "recommendations": ["<actionable recommendation 1>", "<actionable recommendation 2>", "<actionable recommendation 3>"],
-  "savingsTip": "<one specific savings tip relevant to this user's data>",
-  "overallScore": <integer 0-100 representing overall financial health>
+  "summary": "<2-3 sentence personalised overview mentioning actual figures>",
+  "strengths": ["<specific strength with a real number or fact>", "<another strength>"],
+  "concerns": ["<specific concern with real numbers>", "<another concern if applicable>"],
+  "recommendations": [
+    "<actionable recommendation #1 — specific, tied to the user's data>",
+    "<actionable recommendation #2>",
+    "<actionable recommendation #3>"
+  ],
+  "savingsTip": "<one practical, specific savings tip tailored to this user's biggest expense or pattern>",
+  "overallScore": <integer 0-100>
 }
 
 Rules:
-- Respond with valid JSON only. No markdown. No code fences.
-- strengths, concerns, and recommendations must each be non-empty arrays.
-- overallScore must be an integer between 0 and 100.
-- Be specific and actionable. Reference the actual figures where helpful.
+  - All fields required. Arrays must have at least 1 item.
+  - overallScore must be an integer 0–100.
+  - Reference actual ₹ figures and category names — never be generic.
+  - If data is limited, still generate useful insights based on what is available.
 `.trim();
+};
 const isValidInsights = (obj) => {
     if (!obj || typeof obj !== 'object')
         return false;
     const o = obj;
     return (typeof o['summary'] === 'string' &&
-        Array.isArray(o['strengths']) &&
-        Array.isArray(o['concerns']) &&
-        Array.isArray(o['recommendations']) &&
+        Array.isArray(o['strengths']) && o['strengths'].length > 0 &&
+        Array.isArray(o['concerns']) && o['concerns'].length > 0 &&
+        Array.isArray(o['recommendations']) && o['recommendations'].length > 0 &&
         typeof o['savingsTip'] === 'string' &&
         typeof o['overallScore'] === 'number');
 };
 const parseGeminiResponse = (raw) => {
-    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    const cleaned = raw
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim();
     try {
         const parsed = JSON.parse(cleaned);
         return isValidInsights(parsed) ? parsed : null;
@@ -115,10 +183,20 @@ const parseGeminiResponse = (raw) => {
         return null;
     }
 };
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const getAIInsights = async (userId) => {
     const dashboardData = await (0, dashboard_service_1.getDashboardData)(userId);
-    if (dashboardData.summary.transactionCount === 0) {
+    const { transactionCount } = dashboardData.summary;
+    if (transactionCount === 0) {
         return LOW_ACTIVITY;
+    }
+    const cached = await insightsCache_model_1.default.findOne({ user: new mongoose_1.Types.ObjectId(userId) }).lean();
+    const now = Date.now();
+    if (cached &&
+        new Date(cached.expiresAt).getTime() > now &&
+        cached.transactionCount === transactionCount) {
+        console.log('[AI] Returning cached insights for user', userId);
+        return cached.data;
     }
     const context = buildContext(dashboardData);
     const prompt = buildPrompt(context);
@@ -126,15 +204,20 @@ const getAIInsights = async (userId) => {
         const raw = await (0, gemini_services_1.default)(prompt);
         const parsed = parseGeminiResponse(raw);
         if (!parsed) {
-            console.error('[AI] Gemini returned unparseable response:', raw.slice(0, 300));
-            return FALLBACK;
+            console.error('[AI] Gemini returned unparseable response:', raw.slice(0, 400));
+            return cached ? cached.data : FALLBACK;
         }
         parsed.overallScore = Math.max(0, Math.min(100, Math.round(parsed.overallScore)));
+        await insightsCache_model_1.default.findOneAndUpdate({ user: new mongoose_1.Types.ObjectId(userId) }, {
+            data: parsed,
+            transactionCount,
+            expiresAt: new Date(now + CACHE_TTL_MS),
+        }, { upsert: true, new: true });
         return parsed;
     }
     catch (err) {
         console.error('[AI] Gemini call failed:', err instanceof Error ? err.message : err);
-        return FALLBACK;
+        return cached ? cached.data : FALLBACK;
     }
 };
 exports.getAIInsights = getAIInsights;

@@ -15,7 +15,7 @@ const createApp = () => {
     const app = (0, express_1.default)();
     app.use((0, helmet_1.default)());
     app.use((0, cors_1.default)({
-        origin: env_1.config.isDevelopment ? '*' : process.env.ALLOWED_ORIGINS?.split(',') ?? [],
+        origin: env_1.config.isDevelopment ? true : process.env.ALLOWED_ORIGINS?.split(',') ?? [],
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,

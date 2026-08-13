@@ -4,6 +4,7 @@ exports.confirmPasswordReset = exports.requestPasswordReset = exports.googleCall
 const asyncHandler_1 = require("../utils/asyncHandler");
 const response_1 = require("../utils/response");
 const constants_1 = require("../constants");
+const env_1 = require("../config/env");
 const auth_service_1 = require("../services/auth.service");
 const AppError_1 = require("../utils/AppError");
 exports.signup = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
@@ -36,16 +37,20 @@ exports.googleAuth = (0, asyncHandler_1.asyncHandler)(async (_req, res) => {
 exports.googleCallback = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
     const code = req.query.code;
     if (!code) {
-        res.redirect('http://localhost:5173/login?error=oauth_failed');
+        res.redirect(`${env_1.config.frontendUrl}/login?error=oauth_failed`);
         return;
     }
     try {
         const data = await (0, auth_service_1.handleGoogleCallback)(code);
-        res.redirect(`http://localhost:5173/auth/callback?token=${data.token}`);
+        res.redirect(`${env_1.config.frontendUrl}/auth/callback?token=${data.token}`);
     }
     catch (err) {
-        console.error('Google OAuth error:', err);
-        res.redirect('http://localhost:5173/login?error=oauth_failed');
+        const errMsg = err instanceof Error ? err.message : String(err);
+        console.error('[Google OAuth] Callback failed:', errMsg);
+        if (err instanceof Error && err.stack) {
+            console.error('[Google OAuth] Stack:', err.stack);
+        }
+        res.redirect(`${env_1.config.frontendUrl}/login?error=oauth_failed&reason=${encodeURIComponent(errMsg)}`);
     }
 });
 exports.requestPasswordReset = (0, asyncHandler_1.asyncHandler)(async (req, res) => {

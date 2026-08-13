@@ -32,7 +32,7 @@ const createApp = (): Application => {
   // CORS — restrict origins in production via env variable
   app.use(
     cors({
-      origin: config.isDevelopment ? '*' : process.env.ALLOWED_ORIGINS?.split(',') ?? [],
+      origin: config.isDevelopment ? true : process.env.ALLOWED_ORIGINS?.split(',') ?? [],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true,

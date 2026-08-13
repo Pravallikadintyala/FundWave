@@ -5,6 +5,7 @@ export declare const config: {
     readonly nodeEnv: string;
     readonly isDevelopment: boolean;
     readonly isProduction: boolean;
+    readonly frontendUrl: string;
     readonly googleClientId: string;
     readonly googleClientSecret: string;
     readonly googleCallbackUrl: string;

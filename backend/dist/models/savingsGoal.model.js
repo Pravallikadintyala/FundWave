@@ -49,5 +49,6 @@ const savingsGoalSchema = new mongoose_1.Schema({
     versionKey: false,
 });
 const SavingsGoal = (0, mongoose_1.model)('SavingsGoal', savingsGoalSchema);
+savingsGoalSchema.index({ user: 1, createdAt: -1 });
 exports.default = SavingsGoal;
 //# sourceMappingURL=savingsGoal.model.js.map
