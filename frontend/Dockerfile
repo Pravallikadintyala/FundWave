@@ -26,6 +26,10 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copy built assets from builder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
+# Dynamically print the URL if APP_URL is provided in docker-compose
+RUN echo 'if [ -n "$APP_URL" ]; then echo -e "\n\n FundWave Frontend running at $APP_URL\n\n"; fi' > /docker-entrypoint.d/40-print-url.sh && \
+    chmod +x /docker-entrypoint.d/40-print-url.sh
+
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]

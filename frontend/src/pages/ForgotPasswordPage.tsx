@@ -44,7 +44,7 @@ const ForgotPasswordPage = () => {
 
     setIsSubmitting(true);
     try {
-      await authService.forgotPassword({ email: email.trim() });
+      await authService.forgotPassword(email.trim());
       setSuccess(true);
     } catch (err) {
       const axiosErr = err as AxiosError<{ message?: string }>;

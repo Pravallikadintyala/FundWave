@@ -9,10 +9,7 @@ export declare const config: {
     readonly googleClientId: string;
     readonly googleClientSecret: string;
     readonly googleCallbackUrl: string;
-    readonly smtpHost: string;
-    readonly smtpPort: number;
-    readonly smtpUser: string;
-    readonly smtpPass: string;
+    readonly resendApiKey: string;
     readonly emailFrom: string;
 };
 //# sourceMappingURL=env.d.ts.map

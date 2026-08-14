@@ -69,7 +69,7 @@ const ResetPasswordPage = () => {
 
     setIsSubmitting(true);
     try {
-      await authService.resetPassword({ token, newPassword: password });
+      await authService.resetPassword(token, password, confirmPassword);
       setSuccess(true);
       setTimeout(() => {
         navigate('/login', { replace: true });

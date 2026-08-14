@@ -110,7 +110,6 @@ interface FormState {
   email:           string;
   password:        string;
   confirmPassword: string;
-  acceptTerms:     boolean;
 }
 
 interface FormErrors {
@@ -118,7 +117,6 @@ interface FormErrors {
   email?:           string;
   password?:        string;
   confirmPassword?: string;
-  acceptTerms?:     string;
   form?:            string;
 }
 
@@ -152,10 +150,6 @@ function validate(values: FormState): FormErrors {
     errors.confirmPassword = 'Passwords do not match.';
   }
 
-  if (!values.acceptTerms) {
-    errors.acceptTerms = 'You must accept the terms to continue.';
-  }
-
   return errors;
 }
 
@@ -166,7 +160,7 @@ const RegisterPage = () => {
   const { register }  = useAuth();
 
   const [values, setValues]     = useState<FormState>({
-    fullName: '', email: '', password: '', confirmPassword: '', acceptTerms: false,
+    fullName: '', email: '', password: '', confirmPassword: '',
   });
   const [errors, setErrors]     = useState<FormErrors>({});
   const [showPwd, setShowPwd]   = useState(false);
@@ -198,7 +192,7 @@ const RegisterPage = () => {
   // ── Submit ────────────────────────────────────────────────────────────────────
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setTouched({ fullName: true, email: true, password: true, confirmPassword: true, acceptTerms: true });
+    setTouched({ fullName: true, email: true, password: true, confirmPassword: true });
     const clientErrors = validate(values);
 
     if (Object.keys(clientErrors).length > 0) {
@@ -439,35 +433,6 @@ const RegisterPage = () => {
           {fieldError('confirmPassword') && (
             <p id="reg-confirm-error" className="auth-form__field-error" role="alert">
               {fieldError('confirmPassword')}
-            </p>
-          )}
-        </div>
-
-        {/* Accept Terms */}
-        <div className="auth-form__field">
-          <label className="auth-form__checkbox-label" htmlFor="reg-terms">
-            <input
-              id="reg-terms"
-              name="acceptTerms"
-              type="checkbox"
-              className="auth-form__checkbox"
-              checked={values.acceptTerms}
-              onChange={handleChange}
-              onBlur={() => handleBlur('acceptTerms')}
-              aria-invalid={!!fieldError('acceptTerms')}
-              disabled={isSubmitting}
-            />
-            <span className="auth-form__checkbox-custom" aria-hidden="true" />
-            <span className="auth-form__checkbox-text">
-              I agree to the{' '}
-              <Link to="/terms" className="auth-form__footer-link">Terms of Service</Link>
-              {' '}and{' '}
-              <Link to="/privacy" className="auth-form__footer-link">Privacy Policy</Link>
-            </span>
-          </label>
-          {fieldError('acceptTerms') && (
-            <p className="auth-form__field-error" role="alert">
-              {fieldError('acceptTerms')}
             </p>
           )}
         </div>

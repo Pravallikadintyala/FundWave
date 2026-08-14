@@ -6,8 +6,7 @@ import DashboardLayout       from '@/layouts/DashboardLayout';
 import LandingPage           from '@/pages/LandingPage';
 import LoginPage             from '@/pages/LoginPage';
 import RegisterPage          from '@/pages/RegisterPage';
-import ForgotPasswordPage    from '@/pages/ForgotPasswordPage';
-import ResetPasswordPage    from '@/pages/ResetPasswordPage';
+
 import OAuthCallback        from '@/pages/OAuthCallback';
 import DashboardPage         from '@/pages/DashboardPage';
 import TransactionsPage      from '@/pages/TransactionsPage';
@@ -23,8 +22,6 @@ import NotFoundPage          from '@/pages/NotFoundPage';
  *  Public     /                   LandingPage
  *  Auth       /login              LoginPage         ← protected by PublicRoute
  *             /register           RegisterPage          (redirect to /dashboard
- *             /forgot-password    ForgotPasswordPage     if already authed)
- *             /reset-password     ResetPasswordPage
  *             /auth/callback      OAuthCallback
  *  Protected  /dashboard          DashboardPage     ← protected by ProtectedRoute
  *             /transactions       TransactionsPage      (redirect to /login
@@ -43,8 +40,6 @@ const AppRouter = () => (
       <Route element={<AuthLayout />}>
         <Route path="/login"           element={<LoginPage />} />
         <Route path="/register"        element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password"  element={<ResetPasswordPage />} />
       </Route>
     </Route>
 

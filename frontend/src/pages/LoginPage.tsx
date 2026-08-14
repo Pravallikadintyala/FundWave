@@ -257,13 +257,6 @@ const LoginPage = () => {
             <label htmlFor="login-password" className="auth-form__label">
               Password
             </label>
-            <Link
-              to="/forgot-password"
-              className="auth-form__forgot-link"
-              tabIndex={0}
-            >
-              Forgot password?
-            </Link>
           </div>
           <div className={[
             'auth-form__input-wrap',

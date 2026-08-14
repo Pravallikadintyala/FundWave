@@ -12,7 +12,7 @@ const env_1 = require("../config/env");
 const models_1 = require("../models");
 const AppError_1 = require("../utils/AppError");
 const category_service_1 = require("./category.service");
-const email_service_1 = require("./email.service");
+const email_service_1 = require("./email/email.service");
 const constants_1 = require("../constants");
 const SALT_ROUNDS = 10;
 const JWT_EXPIRES_IN = '7d';
@@ -121,7 +121,7 @@ const forgotPassword = async (email) => {
     const resetToken = crypto_1.default.randomBytes(32).toString('hex');
     const hashedToken = crypto_1.default.createHash('sha256').update(resetToken).digest('hex');
     user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpires = new Date(Date.now() + 3600000);
+    user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
     await user.save();
     await (0, email_service_1.sendPasswordResetEmail)(user.email, resetToken);
 };

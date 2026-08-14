@@ -17,14 +17,7 @@ export interface RegisterPayload {
   password: string;
 }
 
-export interface ForgotPasswordPayload {
-  email: string;
-}
-
-export interface ResetPasswordPayload {
-  token: string;
-  newPassword: string;
-}
+// Removed payload types since arguments will be passed directly
 
 export interface UpdateProfilePayload {
   fullName?: string;
@@ -96,11 +89,11 @@ export const authService = {
   logout: () =>
     apiClient.post<LogoutResponseEnvelope>('/auth/logout'),
 
-  forgotPassword: (payload: ForgotPasswordPayload) =>
-    apiClient.post<GenericResponseEnvelope>('/auth/forgot-password', payload),
+  forgotPassword: (email: string) =>
+    apiClient.post<GenericResponseEnvelope>('/auth/forgot-password', { email }),
 
-  resetPassword: (payload: ResetPasswordPayload) =>
-    apiClient.post<GenericResponseEnvelope>('/auth/reset-password', payload),
+  resetPassword: (token: string, password: string, confirmPassword: string) =>
+    apiClient.post<GenericResponseEnvelope>('/auth/reset-password', { token, newPassword: password, confirmPassword }),
 
   getProfile: () =>
     apiClient.get<ProfileResponseEnvelope>('/users/me'),
