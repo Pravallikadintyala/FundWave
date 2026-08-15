@@ -10,7 +10,7 @@ import { config } from '../config/env';
 import { User, BlacklistedToken } from '../models';
 import { AppError } from '../utils/AppError';
 import { seedDefaultCategories } from './category.service';
-import { sendPasswordResetEmail } from './email/email.service';
+//import { sendPasswordResetEmail } from './email/email.service';
 import { HTTP_STATUS } from '../constants';
 import {
   SignupBody,
@@ -171,7 +171,7 @@ export const forgotPassword = async (email: string): Promise<void> => {
   user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000); 
   await user.save();
 
-  await sendPasswordResetEmail(user.email, resetToken);
+  //await sendPasswordResetEmail(user.email, resetToken);
 };
 
 export const resetPassword = async (token: string, newPassword: string): Promise<void> => {
