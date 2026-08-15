@@ -22,7 +22,7 @@ const LandingFooter = () => {
           <div className="lfooter__cta-glow" aria-hidden="true" />
           <div className="lfooter__cta-content">
             <h2 className="lfooter__cta-title">Ready to take control of your finances?</h2>
-            <p className="lfooter__cta-sub">Join thousands of users who've transformed their financial lives with FundWave.</p>
+            <p className="lfooter__cta-sub">Start tracking your personal finances and take control of your budget today.</p>
             <div className="lfooter__cta-btns">
               <button className="lfooter__cta-btn lfooter__cta-btn--primary" onClick={() => navigate('/register')}>
                 Start for Free
@@ -51,13 +51,13 @@ const LandingFooter = () => {
           <div className="lfooter__contact" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             <div className="lfooter__col-title">Contact</div>
             <p className="lfooter__brand-desc">
-              Contact us with <a href="mailto:pravallikad730@gmail.com" className="lfooter__link" style={{ textDecoration: 'underline' }}>pravallikad730@gmail.com</a>. This is my personal project.
+              Contact me at <a href="mailto:pravallikad730@gmail.com" className="lfooter__link" style={{ textDecoration: 'underline' }}>pravallikad730@gmail.com</a>.
             </p>
           </div>
         </div>
 
         <div className="lfooter__bottom">
-          <p className="lfooter__copy">© 2026 FundWave. All rights reserved.</p>
+          <p className="lfooter__copy">© 2026 FundWave</p>
           <p className="lfooter__made">Made with ♥ for smart finance</p>
         </div>
       </div>
